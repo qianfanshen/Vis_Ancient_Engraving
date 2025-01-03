@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>鼠标滚轮翻页示例</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    #content {
+      border: 1px solid #ccc;
+      padding: 20px;
+      margin: 20px;
+      height: 500px;
+      overflow: hidden; /* 防止滚动条出现 */
+    }
+  </style>
+</head>
+<body>
+  <div id="content">使用鼠标滚轮翻页。</div>
+
+  <script>
+    const files = ['page1.html', 'page2.html', 'page3.html']; // 每页对应的文件
+    let currentPage = 0; // 当前页索引
+    let isScrolling = false; // 防止滚轮事件频繁触发
+
+    // 加载页面内容
+    function loadPage(index) {
+      d3.html(files[index]).then(content => {
+        d3.select('#content').html(''); // 清空现有内容
+        d3.select('#content').node().append(content.documentElement); // 添加新内容
+      }).catch(error => {
+        d3.select('#content').html('加载失败，请检查文件路径。');
+        console.error(error);
+      });
+    }
+
+    // 初始加载第一页
+    loadPage(currentPage);
+
+    // 防抖处理函数
+    function debounce(func, delay) {
+      if (isScrolling) return;
+      isScrolling = true;
+      func();
+      setTimeout(() => (isScrolling = false), delay);
+    }
+
+    // 监听鼠标滚轮事件
+    d3.select('body').on('wheel', event => {
+      event.preventDefault(); // 阻止默认滚动行为
+      debounce(() => {
+        if (event.deltaY > 0 && currentPage < files.length - 1) {
+          // 向下滚动，下一页
+          currentPage++;
+          loadPage(currentPage);
+        } else if (event.deltaY < 0 && currentPage > 0) {
+          // 向上滚动，上一页
+          currentPage--;
+          loadPage(currentPage);
+        }
+      }, 500); // 防抖间隔 500ms
+    });
+  </script>
+</body>
+</html>
