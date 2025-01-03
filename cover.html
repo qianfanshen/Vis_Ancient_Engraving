@@ -1,22 +1,112 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>封面</title>
+  <title>封面页</title>
+  <link rel="stylesheet" href="assets/style.css">
   <style>
-    body {
-      background-color: black;
-      color: white;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      font-size: 32px;
+    /* ✅ 自定义字体 */
+    @font-face {
+        font-family: 'MyCustomFont';
+        src: url('assets/Kaiti.ttf') format('truetype'); /* 替换成你的字体文件 */
+    }
+
+    /* ✅ 标题样式 */
+    .cover-title {
+        position: absolute;
+        left: 8%;  /* 左侧位置 */
+        top: 35%;
+        transform: translateY(-50%);
+        font-size: 55px;
+        color: #8B0000; /* 棕红色 */
+        font-family: 'MyCustomFont', serif;
+        opacity: 0;
+        animation: fadeIn 2s ease-in-out forwards;
+    }
+    .cover-title-en {
+        position: absolute;
+        left: 8%;
+        top: 40%; /* 比中文标题低一些 */
+        transform: translateY(-50%);
+        font-size: 24px;
+        color: #6e6e6e; /* 灰色，避免喧宾夺主 */
+        font-family: "Times New Roman", Times, serif;
+        opacity: 0;
+        animation: fadeInUp 2s ease-in-out 0.5s forwards; /* 0.5s 延迟，慢慢浮现 */
+    }
+
+    /* ✅ 名字样式 */
+    .author-name {
+        position: absolute;
+        left: 8%;
+        top: 45%; /* 调整位置，使其在标题正下方 */
+        transform: translateY(-50%);
+        font-size: 28px;
+        color: rgb(41, 41, 41); /* 默认黑色 */
+        font-family: Arial, sans-serif; /* 默认字体 */
+        opacity: 0;
+        animation: fadeInUp 2s ease-in-out 1s forwards; /* 延迟 1s，保证标题先出现 */
+    }
+
+    /* ✅ 右侧正方形图片 */
+    .square-image {
+        position: absolute;
+        right: 5%;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 40vw;
+        max-width: 800px;
+        aspect-ratio: 1/1;
+        opacity: 0;
+        animation: fadeIn 2s ease-in-out forwards; 
+    }
+
+    /* ✅ 图片样式 */
+    .square-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    /* ✅ 动画：标题 & 图片（淡入） */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-50%) scale(0.8);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(-50%) scale(1);
+        }
+    }
+
+    /* ✅ 动画：名字（向上浮现） */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
   </style>
 </head>
 <body>
-  <h1>欢迎来到鼠标滚轮翻页示例</h1>
+
+  <!-- ✅ 标题 -->
+  <h1 class="cover-title">二十四史古今刊刻与馆藏可视化</h1>
+  <h2 class="cover-title-en">The Visualization of the Twenty-Four Histories' Publishing and Collection</h2>
+
+  <!-- ✅ 名字（默认黑色） -->
+  <h2 class="author-name">沈千帆 田一阳 戈旷植</h2>
+
+  <!-- ✅ 右侧正方形图片 -->
+  <div class="square-image">
+    <img src="assets/title_word_cloud.png" alt="封面图片">
+  </div>
+
 </body>
 </html>
