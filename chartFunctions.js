@@ -180,7 +180,7 @@ function initializeChartPage2() {
 
         // Force simulation
         let simulation = d3.forceSimulation(books)
-            .force("charge", d3.forceManyBody().strength(-80)) // 增加斥力强度
+            .force("charge", d3.forceManyBody().strength(-60)) // 增加斥力强度
             .force("center", d3.forceCenter(width / 2, height / 2))
             .force("collision", d3.forceCollide().radius(20)) // 调整碰撞半径
             .force("x", d3.forceX(width / 2).strength(0.1)) // 增加水平对齐的强度
@@ -211,16 +211,16 @@ function initializeChartPage2() {
             .data(histories)
             .enter()
             .append("g")
-            .attr("transform", (d, i) => `translate(0,${i * 20})`);
+            .attr("transform", (d, i) => `translate(0,${100 + i * 20})`);
 
         legend.append("rect")
-            .attr("x", width - 100)
+            .attr("x", width + 25)
             .attr("width", 18)
             .attr("height", 18)
             .attr("fill", d => color(d));
 
         legend.append("text")
-            .attr("x", width - 75)
+            .attr("x", width + 50)
             .attr("y", 9)
             .attr("dy", ".35em")
             .text(d => d);
