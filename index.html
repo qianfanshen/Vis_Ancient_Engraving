@@ -6,6 +6,7 @@
   <title>二十四史古今刊刻与馆藏</title>
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="chartFunctions.js"></script>
   <style>
     body {
       margin: 0;
@@ -92,6 +93,12 @@ function loadPage(index) {
     // 更新箭头可见性
     upArrow.style.display = index === 0 ? 'none' : 'block';
     downArrow.style.display = index === files.length - 1 ? 'none' : 'block';
+
+    if (index === 2) {
+      initializeChartPage2(); // 页1初始化
+    } else if (index === 3) {
+      initializeChartPage3(); // 页2初始化
+    } 
   });
 }
 
