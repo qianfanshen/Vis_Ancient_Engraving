@@ -40,26 +40,26 @@
       user-select: none;
       background: none; /* 移除背景 */
     }
-    
+
     .arrow img {
       width: 65px; /* 调小箭头大小 */
       height: auto;
       transition: filter 0.3s ease-in-out;
     }
-    
+
     .arrow:hover img {
       filter: brightness(0.7); /* 鼠标悬停时变深 */
     }
-    
+
     #upArrow {
       top: 20px;
       display: none; /* 默认隐藏 */
     }
-    
+
     #downArrow {
       bottom: 20px;
     }
-    
+
   </style>
 </head>
 <body>
@@ -73,7 +73,7 @@
   <button id="downArrow" class="arrow">
     <img src="assets/arrow-down.svg" alt="下一页" />
   </button>
-  
+
   <script>
     // 每次在这里添加新的页面即可
     const files = ['cover.html', 'page1.html', 'page2.html', 'page3.html']; // 页面内容文件
@@ -98,15 +98,15 @@ function loadPage(index) {
       initializeChartPage2(); // 页1初始化
     } else if (index === 3) {
       initializeChartPage3(); // 页2初始化
-    } 
+    }
   });
 }
 
 
 
-    
+
     loadPage(currentPage);
-    
+
 
     // 防抖处理
     function debounce(func, delay) {
@@ -136,14 +136,14 @@ function loadPage(index) {
         loadPage(currentPage, 'up'); // 向上翻页
       }
     });
-    
+
     downArrow.addEventListener('click', () => {
       if (currentPage < files.length - 1) {
         currentPage++;
         loadPage(currentPage, 'down'); // 向下翻页
       }
     });
-    
+
     document.addEventListener('keydown', event => {
       if (event.key === 'ArrowUp' && currentPage > 0) {
         currentPage--;
@@ -153,7 +153,7 @@ function loadPage(index) {
         loadPage(currentPage, 'down'); // 向下翻页
       }
     });
-    
+
   </script>
 </body>
 </html>
