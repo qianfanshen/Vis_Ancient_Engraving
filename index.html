@@ -41,7 +41,7 @@
     }
     
     .arrow img {
-      width: 80px; /* 调小箭头大小 */
+      width: 65px; /* 调小箭头大小 */
       height: auto;
       transition: filter 0.3s ease-in-out;
     }
@@ -82,31 +82,21 @@
     const downArrow = document.getElementById('downArrow');
 
     // 加载页面内容
-    function loadPage(index) {
-      d3.html(files[index]).then(content => {
-        if (index === 0) {
-          d3.select('#content').html('');
-          d3.select('#content').node().append(content.documentElement);
-        } else {
-          const newPage = d3.select('#container')
-            .append('div')
-            .attr('class', 'page')
-            .style('opacity', 0)
-            .html('')
-            .node();
-          newPage.appendChild(content.documentElement);
+    // 加载页面内容（添加滑动翻页动画）
+// 直接切换页面，无动画
+function loadPage(index) {
+  d3.html(files[index]).then(content => {
+    d3.select('#content').html(''); // 清空当前内容
+    d3.select('#content').node().append(content.documentElement); // 直接替换内容
 
-          d3.select(newPage).transition().duration(600).style('opacity', 1);
-          d3.select('#content').transition().duration(600).style('opacity', 0).on('end', () => d3.select('#content').remove());
+    // 更新箭头可见性
+    upArrow.style.display = index === 0 ? 'none' : 'block';
+    downArrow.style.display = index === files.length - 1 ? 'none' : 'block';
+  });
+}
 
-          d3.select(newPage).attr('id', 'content');
-        }
 
-        // 更新箭头可见性
-        upArrow.style.display = index === 0 ? 'none' : 'block';
-        downArrow.style.display = index === files.length - 1 ? 'none' : 'block';
-      });
-    }
+
     
     loadPage(currentPage);
     
@@ -121,16 +111,14 @@
 
     // 监听滚轮事件
     d3.select('body').on('wheel', event => {
-      event.preventDefault(); // 阻止默认滚动行为
+      event.preventDefault();
       debounce(() => {
         if (event.deltaY > 0 && currentPage < files.length - 1) {
-          // 向下滚动
           currentPage++;
-          loadPage(currentPage, 'down');
+          loadPage(currentPage, 'down'); // 向下翻页
         } else if (event.deltaY < 0 && currentPage > 0) {
-          // 向上滚动
           currentPage--;
-          loadPage(currentPage, 'up');
+          loadPage(currentPage, 'up'); // 向上翻页
         }
       }, 500);
     });
@@ -138,27 +126,27 @@
     upArrow.addEventListener('click', () => {
       if (currentPage > 0) {
         currentPage--;
-        loadPage(currentPage);
+        loadPage(currentPage, 'up'); // 向上翻页
       }
     });
-
+    
     downArrow.addEventListener('click', () => {
       if (currentPage < files.length - 1) {
         currentPage++;
-        loadPage(currentPage);
+        loadPage(currentPage, 'down'); // 向下翻页
       }
     });
+    
     document.addEventListener('keydown', event => {
       if (event.key === 'ArrowUp' && currentPage > 0) {
-        // 按 ↑ 上箭头翻到上一页
         currentPage--;
-        loadPage(currentPage);
+        loadPage(currentPage, 'up'); // 向上翻页
       } else if (event.key === 'ArrowDown' && currentPage < files.length - 1) {
-        // 按 ↓ 下箭头翻到下一页
         currentPage++;
-        loadPage(currentPage);
+        loadPage(currentPage, 'down'); // 向下翻页
       }
     });
+    
   </script>
 </body>
 </html>

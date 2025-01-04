@@ -9,28 +9,32 @@
     /* ✅ 自定义字体 */
     @font-face {
         font-family: 'MyCustomFont';
-        src: url('assets/Kaiti.TTF') format('truetype'); /* 替换成你的字体文件 */
+        src: url('assets/Kaiti.ttf') format('truetype'); /* 替换成你的字体文件 */
     }
 
-    /* ✅ 标题样式 */
+    /* ✅ 页面居中布局 */
+    .cover-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center; /* 居中对齐 */
+        justify-content: center; /* 垂直居中 */
+        height: 100vh; /* 占满整个屏幕高度 */
+        text-align: center;
+    }
+
+    /* ✅ 标题样式（中文） */
     .cover-title {
-        position: absolute;
-        left: 8%;  /* 左侧位置 */
-        top: 35%;
-        transform: translateY(-50%);
         font-size: 55px;
         color: #8B0000; /* 棕红色 */
         font-family: 'MyCustomFont', serif;
         opacity: 0;
         animation: fadeIn 2s ease-in-out forwards;
     }
+
+    /* ✅ 标题样式（英文翻译） */
     .cover-title-en {
-        position: absolute;
-        left: 8%;
-        top: 40%; /* 比中文标题低一些 */
-        transform: translateY(-50%);
         font-size: 24px;
-        color: #6e6e6e; /* 灰色，避免喧宾夺主 */
+        color: #555; /* 灰色，避免喧宾夺主 */
         font-family: "Times New Roman", Times, serif;
         opacity: 0;
         animation: fadeInUp 2s ease-in-out 0.5s forwards; /* 0.5s 延迟，慢慢浮现 */
@@ -38,15 +42,11 @@
 
     /* ✅ 名字样式 */
     .author-name {
-        position: absolute;
-        left: 8%;
-        top: 45%; /* 调整位置，使其在标题正下方 */
-        transform: translateY(-50%);
         font-size: 28px;
-        color: rgb(41, 41, 41); /* 默认黑色 */
-        font-family: Arial, sans-serif; /* 默认字体 */
+        color: black;
+        font-family: Arial, sans-serif;
         opacity: 0;
-        animation: fadeInUp 2s ease-in-out 1s forwards; /* 延迟 1s，保证标题先出现 */
+        animation: fadeInUp 2s ease-in-out 1s forwards; /* 1s 延迟，让标题先出现 */
     }
 
     /* ✅ 右侧正方形图片 */
@@ -73,15 +73,15 @@
     @keyframes fadeIn {
         from {
             opacity: 0;
-            transform: translateY(-50%) scale(0.8);
+            transform: scale(0.8);
         }
         to {
             opacity: 1;
-            transform: translateY(-50%) scale(1);
+            transform: scale(1);
         }
     }
 
-    /* ✅ 动画：名字（向上浮现） */
+    /* ✅ 动画：名字 & 英文翻译（向上浮现） */
     @keyframes fadeInUp {
         from {
             opacity: 0;
@@ -96,17 +96,13 @@
 </head>
 <body>
 
-  <!-- ✅ 标题 -->
-  <h1 class="cover-title">二十四史古今刊刻与馆藏可视化</h1>
-  <h2 class="cover-title-en">The Visualization of the Twenty-Four Histories' Publishing and Collection</h2>
-
-  <!-- ✅ 名字（默认黑色） -->
-  <h2 class="author-name">沈千帆 田一阳 戈旷植</h2>
-
-  <!-- ✅ 右侧正方形图片 -->
-  <div class="square-image">
-    <img src="assets/title_word_cloud.png" alt="封面图片">
+  <!-- ✅ 文字部分包裹在 .cover-container 里，让它居中 -->
+  <div class="cover-container">
+    <h1 class="cover-title">二十四史古今刊刻与馆藏可视化</h1>
+    <h2 class="cover-title-en">The Visualization of the Twenty-Four Histories' Publishing and Collection</h2>
+    <h2 class="author-name">沈千帆 田一阳 戈旷植</h2>
   </div>
+
 
 </body>
 </html>

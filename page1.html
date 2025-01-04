@@ -1,9 +1,89 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>封面页</title>
   <link rel="stylesheet" href="assets/style.css">
+  <style>
+    .cover-text {
+      position: absolute;
+      left: 5%;
+      top: 50%; /* 让内容从中间开始 */
+      transform: translateY(-50%); /* 垂直居中 */
+      font-size: clamp(18px, 2vw, 26px); /* 限制字体大小，适应不同屏幕 */
+      color: #333;
+      font-family: "KaiTi", "STKaiti", "楷体", "Kaiti SC", serif;
+      max-width: 45vw; /* 限制最大宽度，防止超出 */
+      max-height: 80vh; /* 限制最大高度，防止超出 */
+      overflow-y: auto; /* 如果内容超出，则显示滚动条 */
+      line-height: 1.8;
+      text-align: justify;
+      word-break: break-word;
+      padding-right: 10px; /* 预留滚动条空间，避免文本挤压 */
+      animation: fadeIn 2s ease-in-out forwards;
+  }
+
+  /* ✅ 右侧图片自适应 */
+  .square-image {
+      position: absolute;
+      right: 5%;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 40vw; /* 适应屏幕 */
+      max-width: 800px; /* 限制最大宽度 */
+      aspect-ratio: 1/1; /* 保持正方形 */
+      animation: fadeIn 2s ease-in-out forwards;
+  }
+
+  /* ✅ 让图片也随着屏幕缩放 */
+  .square-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+  }
+
+    /* ✅ 动画：标题 & 图片（淡入） */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-50%) scale(0.8);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(-50%) scale(1);
+        }
+    }
+
+    /* ✅ 动画：文字浮现 */
+    @keyframes fadeInUp {
+      from {
+          opacity: 0;
+          transform: translateY(100vh); /* 从屏幕底部开始 */
+      }
+      to {
+          opacity: 1;
+          transform: translateY(0);
+      }
+  }
+  
+  </style>
 </head>
 <body>
-  <h1>这是第一页</h1>
+
+  <!-- ✅ 左侧介绍性文字 -->
+  <div class="cover-text">
+    <p>
+    <b>二十四史</b>，是对中国历代撰写的二十四部正史的总称，均为纪传体。它上起传说中的黄帝时期，下至明朝崇祯年间。二十四史作为中国正史的主体，以历代王朝的兴亡更替为框架，反映了中国波澜壮阔的历史进程，其系统性与连续性对于历史研究有着重要的意义。二十四史能流传至今，离不开各个朝代文士对
+    于史料的整理、刊刻，修订。
+    </p>
+    <p>我们在中国古籍总目数据库中根据二十四史每部史料的编撰者进行索引和校对，共筛选出<b>506</b>条刊刻、馆藏数据进行可视化分析。</p>
+  </div>
+
+  <!-- ✅ 右侧正方形图片 -->
+  <div class="square-image">
+    <img src="assets/title_word_cloud.png" alt="封面图片">
+  </div>
+
 </body>
 </html>

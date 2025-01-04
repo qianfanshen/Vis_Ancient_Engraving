@@ -3,4 +3,35 @@ body {
     background-size: cover;
     background-attachment: fixed;
   }
+/* ✅ 让文本自动适应屏幕大小 */
+.cover-text {
+    position: absolute;
+    left: 5%;
+    top: 10%;
+    font-size: 2.2vw; /* 让字体大小随屏幕缩放 */
+    color: #333; /* 深灰色，提高可读性 */
+    font-family: serif; /* 使用系统默认字体 */
+    max-width: 45vw; /* 限制最大宽度，防止超出 */
+    line-height: 1.8; /* 增加行间距 */
+    text-align: justify; /* 让文本两端对齐 */
+    word-break: break-word; /* 处理长单词，防止溢出 */
+}
+
+/* ✅ 右侧图片自适应 */
+.square-image {
+    position: absolute;
+    right: 5%;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40vw; /* 适应屏幕 */
+    max-width: 800px; /* 限制最大宽度 */
+    aspect-ratio: 1/1; /* 保持正方形 */
+}
+
+/* ✅ 让图片也随着屏幕缩放 */
+.square-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
   
