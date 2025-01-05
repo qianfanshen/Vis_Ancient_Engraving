@@ -262,37 +262,42 @@ function initializeChartPage2() {
 // 页面 4 的折线图初始化函数
 function initializeChartPageTypeDist() {
     d3.json("assets/data2.json").then(data => {
-
+  
       const margin = { top: 50, right: 80, bottom: 50, left: 80 };
       const width = 800 - margin.left - margin.right;
       const height = 500 - margin.top - margin.bottom;
-
+  
       const svg = d3.select("svg")
                     .append("g")
                     .attr("transform", `translate(${margin.left},${margin.top})`);
-
+  
       // 2. 定义 X 轴和 Y 轴
-      const xScale = d3.scalePoint()
+      const xScale = d3.scaleBand()
                       .domain(data.map(d => d.type))
                       .range([0, width])
-                      .padding(0.5);
-
+                      .padding(0.1);  // 设置柱状图之间的间隙
+  
+      // 调整 yScale 的 domain，使得最小值稍微大于 0，确保0的柱可以显示
       const yScale = d3.scaleLinear()
-                      .domain([0, d3.max(data, d => Math.max(d["宋代"], d["元代"], d["明代"], d["清代"], d["民国"], d["现代"]))])
-                      //.domain([0, 100])
+                      .domain([-5, d3.max(data, d => Math.max(d["宋代"], d["元代"], d["明代"], d["清代"], d["民国"], d["现代"]))])  // 稍微扩大最大值
                       .range([height, 0]);
-
+  
       // 3. 画 X 轴和 Y 轴
       svg.append("g")
          .attr("transform", `translate(0, ${height})`)
          .call(d3.axisBottom(xScale))
          .style("font-size", "24px")
          .style("font-family", "KaiTi");
-
+  
+      // 设定 y 轴，并使用百分号格式化
+      const yAxis = d3.axisLeft(yScale)
+                      .ticks(5)  // 设置刻度数
+                      .tickFormat(d => `${d}%`); // 添加百分号
+  
       svg.append("g")
-         .call(d3.axisLeft(yScale))
+         .call(yAxis)
          .style("font-size", "24px");
-
+  
       // 4. 定义颜色
       const colors = {
         "宋代": "#8D4BBB",
@@ -302,85 +307,37 @@ function initializeChartPageTypeDist() {
         "民国": "#177CB0",
         "现代": "#F20C00"
       };
-
-      // 5. 画折线
-      const line = d3.line()
-                    .x(d => xScale(d.type))
-                    .y(d => yScale(d.value))
-                    .curve(d3.curveMonotoneX);
-
+  
+      // 5. 画柱状图
       const categories = ["宋代", "元代", "明代", "清代", "民国", "现代"];
       const visibility = { "宋代": true, "元代": true, "明代": true, "清代": true, "民国": true, "现代": true };
-
+  
       categories.forEach(category => {
-        // 创建折线
-        const path = svg.append("path")
-                        .datum(data.map(d => ({ type: d.type, value: d[category] }))) // 使用该类别的数据
-                        .attr("fill", "none")
-                        .attr("stroke", colors[category])
-                        .attr("stroke-width", 2)
-                        .attr("class", `line ${category}`)
-                        .attr("d", line)
-                        .style("stroke-dasharray", function() {
-                          const length = this.getTotalLength();
-                          return `${length} ${length}`;
-                        })
-                        .style("stroke-dashoffset", function() {
-                          return this.getTotalLength();
-                        })
-                        .transition()
-                        .duration(1000)
-                        .style("stroke-dashoffset", 0); // 动画过渡显示折线
-
-        // 添加每个数据点
-        svg.selectAll(`.dot.${category}`)
+        // 为每个类别创建一组柱状图
+        svg.selectAll(`.bar.${category}`)
            .data(data)
            .enter()
-           .append("circle")
-           .attr("class", `dot ${category}`)
-           .attr("cx", d => xScale(d.type))
-           .attr("cy", d => yScale(d[category]))
-           .attr("r", 5)
+           .append("rect")
+           .attr("class", `bar ${category}`)
+           .attr("x", d => xScale(d.type) + (categories.indexOf(category) * (xScale.bandwidth() / categories.length))) // 对每个类别的位置进行微调
+           .attr("y", d => yScale(d[category]))
+           .attr("width", xScale.bandwidth() / categories.length)  // 每个类别的柱宽
+           .attr("height", d => height - yScale(d[category]))  // 高度根据数据变化
            .attr("fill", colors[category])
-           .style("opacity", 0) // 初始时点不可见
+           .style("opacity", 0) // 初始时柱状图不可见
            .transition()
-           .duration(2000)
-           .delay((d, i) => i * 200) // 每个点逐步显现
-           .style("opacity", 1); // 过渡显示点
-
+           .duration(1000)
+           .delay((d, i) => i * 200) // 每个柱状图逐步显现
+           .style("opacity", 1); // 过渡显示柱状图
       });
-
-      // 6. 图例（可点击隐藏/显示）
-    //   const legend = svg.selectAll(".legend")
-    //                     .data(categories)
-    //                     .enter()
-    //                     .append("g")
-    //                     .attr("class", "legend")
-    //                     .attr("transform", (d, i) => `translate(${i * 150}, ${height + 50})`)
-    //                     .on("click", function(event, category) {
-    //                         visibility[category] = !visibility[category]; // 切换可见性
-    //                         d3.select(`.line.${category}`).style("display", visibility[category] ? "block" : "none");
-    //                         d3.selectAll(`.dot.${category}`).style("display", visibility[category] ? "block" : "none");
-    //                     });
-
-    //   legend.append("rect")
-    //         .attr("width", 15)
-    //         .attr("height", 15)
-    //         .attr("fill", d => colors[d]);
-
-    //   legend.append("text")
-    //         .attr("x", 30)
-    //         .attr("y", 20)
-    //         .text(d => d)
-    //         .style("cursor", "pointer");
-
-      // 7. 创建折线选择按钮
+  
+      // 6. 创建折线选择按钮（控制柱状图的显示和隐藏）
       const buttonContainer = svg.append("g")
                                  .attr("transform", `translate(0, ${height + 80})`);
-
+  
       categories.forEach((category, i) => {
         buttonContainer.append("rect")
-                       .attr("x", i * 100+30)
+                       .attr("x", i * 100 + 30)
                        .attr("y", 0)
                        .attr("width", 80)
                        .attr("height", 50)
@@ -388,10 +345,9 @@ function initializeChartPageTypeDist() {
                        .style("cursor", "pointer")
                        .on("click", function() {
                            visibility[category] = !visibility[category]; // 切换可见性
-                           d3.select(`.line.${category}`).style("display", visibility[category] ? "block" : "none");
-                           d3.selectAll(`.dot.${category}`).style("display", visibility[category] ? "block" : "none");
+                           d3.selectAll(`.bar.${category}`).style("display", visibility[category] ? "block" : "none");
                        });
-
+  
         buttonContainer.append("text")
                        .attr("x", i * 100 + 70)
                        .attr("y", 35)
@@ -401,6 +357,7 @@ function initializeChartPageTypeDist() {
                        .style("font-family", "KaiTi", "STKaiti", "楷体", "Kaiti SC")
                        .text(category);
       });
-
+  
     });
   }
+  
