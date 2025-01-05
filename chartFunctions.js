@@ -278,7 +278,7 @@ function initializeChartPageTypeDist() {
                       .padding(0.5);
 
       const yScale = d3.scaleLinear()
-                      .domain([0, d3.max(data, d => Math.max(d["刻本"], d["印本"], d["抄本"], d["修本"]))])
+                      .domain([0, d3.max(data, d => Math.max(d["刻本百分比"], d["印本百分比"], d["抄本百分比"], d["修本百分比"]))])
                       .range([height, 0]);
 
       // 3. 画 X 轴和 Y 轴
