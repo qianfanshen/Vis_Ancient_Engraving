@@ -259,9 +259,9 @@ function initializeChartPage2() {
 
 
 
-// 页面 1 的折线图初始化函数
+// 页面 4 的折线图初始化函数
 function initializeChartPageTypeDist() {
-    d3.json("assets/data1.json").then(data => {
+    d3.json("assets/data2.json").then(data => {
 
       const margin = { top: 50, right: 80, bottom: 50, left: 80 };
       const width = 800 - margin.left - margin.right;
@@ -273,12 +273,13 @@ function initializeChartPageTypeDist() {
 
       // 2. 定义 X 轴和 Y 轴
       const xScale = d3.scalePoint()
-                      .domain(data.map(d => d.period))
+                      .domain(data.map(d => d.type))
                       .range([0, width])
                       .padding(0.5);
 
       const yScale = d3.scaleLinear()
-                      .domain([0, d3.max(data, d => Math.max(d["刻本百分比"], d["印本百分比"], d["抄本百分比"], d["修本百分比"]))])
+                      .domain([0, d3.max(data, d => Math.max(d["宋代"], d["元代"], d["明代"], d["清代"], d["民国"], d["现代"]))])
+                      //.domain([0, 100])
                       .range([height, 0]);
 
       // 3. 画 X 轴和 Y 轴
@@ -294,25 +295,27 @@ function initializeChartPageTypeDist() {
 
       // 4. 定义颜色
       const colors = {
-        "刻本": "#696969",
-        "印本": "#DDA0DD",
-        "抄本": "#CD5C5C",
-        "修本": "#808000"
+        "宋代": "#8D4BBB",
+        "元代": "#549688",
+        "明代": "#FFA631",
+        "清代": "#3DE1AD",
+        "民国": "#177CB0",
+        "现代": "#F20C00"
       };
 
       // 5. 画折线
       const line = d3.line()
-                    .x(d => xScale(d.period))
+                    .x(d => xScale(d.type))
                     .y(d => yScale(d.value))
                     .curve(d3.curveMonotoneX);
 
-      const categories = ["刻本", "印本", "抄本", "修本"];
-      const visibility = { "刻本": true, "印本": true, "抄本": true, "修本": true };
+      const categories = ["宋代", "元代", "明代", "清代", "民国", "现代"];
+      const visibility = { "宋代": true, "元代": true, "明代": true, "清代": true, "民国": true, "现代": true };
 
       categories.forEach(category => {
         // 创建折线
         const path = svg.append("path")
-                        .datum(data.map(d => ({ period: d.period, value: d[category] }))) // 使用该类别的数据
+                        .datum(data.map(d => ({ type: d.type, value: d[category] }))) // 使用该类别的数据
                         .attr("fill", "none")
                         .attr("stroke", colors[category])
                         .attr("stroke-width", 2)
@@ -335,7 +338,7 @@ function initializeChartPageTypeDist() {
            .enter()
            .append("circle")
            .attr("class", `dot ${category}`)
-           .attr("cx", d => xScale(d.period))
+           .attr("cx", d => xScale(d.type))
            .attr("cy", d => yScale(d[category]))
            .attr("r", 5)
            .attr("fill", colors[category])
@@ -377,9 +380,9 @@ function initializeChartPageTypeDist() {
 
       categories.forEach((category, i) => {
         buttonContainer.append("rect")
-                       .attr("x", i * 150+30)
+                       .attr("x", i * 100+30)
                        .attr("y", 0)
-                       .attr("width", 130)
+                       .attr("width", 80)
                        .attr("height", 50)
                        .attr("fill", colors[category])
                        .style("cursor", "pointer")
@@ -390,11 +393,11 @@ function initializeChartPageTypeDist() {
                        });
 
         buttonContainer.append("text")
-                       .attr("x", i * 150 + 95)
+                       .attr("x", i * 100 + 70)
                        .attr("y", 35)
                        .attr("text-anchor", "middle")
                        .attr("fill", "#fff")
-                       .style("font-size", "30px")
+                       .style("font-size", "24px")
                        .style("font-family", "KaiTi", "STKaiti", "楷体", "Kaiti SC")
                        .text(category);
       });

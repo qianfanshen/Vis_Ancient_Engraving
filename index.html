@@ -76,7 +76,7 @@
 
   <script>
     // 每次在这里添加新的页面即可
-    const files = ['cover.html', 'page1.html', 'page2.html', 'page3.html']; // 页面内容文件
+    const files = ['cover.html', 'page1.html', 'page2.html', 'page3.html', 'page_type_dist.html']; // 页面内容文件
     let currentPage = 0; // 当前页面索引
     let isScrolling = false; // 防止滚动事件频繁触发
     const upArrow = document.getElementById('upArrow');
@@ -98,6 +98,8 @@ function loadPage(index) {
       initializeChartPage2(); // 页1初始化
     } else if (index === 3) {
       initializeChartPage3(); // 页2初始化
+    } else if (index === 4) {
+      initializeChartPageTypeDist();
     }
   });
 }
