@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>地图页框架</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        .left, .right {
+            padding: 10px;
+        }
+        .left {
+            width: 40%;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+        .left img {
+            width: 45%;
+            margin-bottom: 10px;
+        }
+        .right {
+            width: 60%;
+        }
+        .timeline {
+            width: 100%;
+            height: 10%;
+            background-color: #eee;
+            border-top: 2px solid #ccc;
+        }
+        .map {
+            width: 100%;
+            height: 100%;
+            background-color: #f0f0f0;
+        }
+        .timeline-item {
+            display: inline-block;
+            width: 10%;
+            height: 100%;
+            text-align: center;
+            line-height: 50px;
+            background-color: #ddd;
+            margin: 0 2px;
+            cursor: pointer;
+        }
+        .timeline-item:hover {
+            background-color: #aaa;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- 主内容部分 -->
+        <div class="content">
+            <!-- 左侧书籍封面 -->
+            <div class="left">
+                <img src="book1.png" alt="Book 1">
+                <img src="book2.png" alt="Book 2">
+                <img src="book3.png" alt="Book 3">
+                <img src="book4.png" alt="Book 4">
+                <img src="book5.png" alt="Book 5">
+                <img src="book6.png" alt="Book 6">
+                <img src="book7.png" alt="Book 7">
+                <img src="book8.png" alt="Book 8">
+                <img src="book9.png" alt="Book 9">
+                <img src="book10.png" alt="Book 10">
+                <img src="book11.png" alt="Book 11">
+                <img src="book12.png" alt="Book 12">
+                <img src="book13.png" alt="Book 13">
+                <img src="book14.png" alt="Book 14">
+                <img src="book15.png" alt="Book 15">
+                <img src="book16.png" alt="Book 16">
+                <img src="book17.png" alt="Book 17">
+                <img src="book18.png" alt="Book 18">
+                <img src="book19.png" alt="Book 19">
+                <img src="book20.png" alt="Book 20">
+                <img src="book21.png" alt="Book 21">
+                <img src="book22.png" alt="Book 22">
+                <img src="book23.png" alt="Book 23">
+                <img src="book24.png" alt="Book 24">
+            </div>
+
+            <!-- 右侧地图 -->
+            <div class="right">
+                <div id="map" class="map">
+                    <!-- 你可以在这里加载地图，比如使用Leaflet.js -->
+                    <p>地图加载区（使用地图文件及polygon绘制）</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 时间轴部分 -->
+        <div class="timeline">
+            <div class="timeline-item" onclick="alert('Item 1 clicked')">2020</div>
+            <div class="timeline-item" onclick="alert('Item 2 clicked')">2021</div>
+            <div class="timeline-item" onclick="alert('Item 3 clicked')">2022</div>
+            <div class="timeline-item" onclick="alert('Item 4 clicked')">2023</div>
+            <div class="timeline-item" onclick="alert('Item 5 clicked')">2024</div>
+            <div class="timeline-item" onclick="alert('Item 6 clicked')">2025</div>
+            <div class="timeline-item" onclick="alert('Item 7 clicked')">2026</div>
+            <div class="timeline-item" onclick="alert('Item 8 clicked')">2027</div>
+            <div class="timeline-item" onclick="alert('Item 9 clicked')">2028</div>
+            <div class="timeline-item" onclick="alert('Item 10 clicked')">2029</div>
+        </div>
+    </div>
+
+    <!-- 引入地图JS库 -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        // 地图初始化代码
+        var map = L.map('map').setView([51.505, -0.09], 2);  // 初始视图的经纬度
+
+        // 地图的底图
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // 示例：地图上的多边形绘制（你可以根据你的数据来绘制）
+        var polygon = L.polygon([
+            [51.509, -0.08],
+            [51.503, -0.06],
+            [51.51, -0.047]
+        ]).addTo(map);
+        
+        polygon.bindPopup("这是一个区域");
+
+        // 这里可以替换为更复杂的多边形或区域数据
+    </script>
+</body>
+</html>
