@@ -149,155 +149,215 @@ function initializeChartPage2() {
 
 
 
-  // 页面 3 的折线图初始化函数
   function initializeChartPage3(selectedCategory = "all") {
-    const svg = d3.select("#scatterplot")
-    .attr("width", 1500) // 增加宽度
-    .attr("height", 800); // 增加高度
-    const width = +svg.attr("width"); // Ensure width is a number
-    const height = +svg.attr("height"); // Ensure height is a number
-
+    // 加载数据
     d3.json("assets/data.json").then(function(data) {
-        // Process data
-        let books = [];
-        for (let [history, entries] of Object.entries(data)) {
-            entries.forEach(entry => {
-                entry.history = history;
-                books.push(entry);
+        // 过滤数据（如果需要）
+        const filteredData = selectedCategory === "all"
+            ? data
+            : Object.keys(data).reduce((acc, key) => {
+                acc[key] = data[key].filter(d => d.category === selectedCategory);
+                return acc;
+            }, {});
+
+        // 计算每部史书的古籍数量
+        const bookCounts = Object.keys(filteredData).map(key => ({
+            name: key,
+            count: filteredData[key].length,
+            radius: Math.sqrt(filteredData[key].length) * 10 // 区域大小与古籍数量成正比
+        }));
+
+        // 设置画布尺寸
+        const width = 1000; // 矩形区域宽度
+        const height = 600; // 矩形区域高度
+        const padding = 50;
+
+        // 创建 SVG 画布
+        const svg = d3.select("#chart")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height);
+
+        // 颜色比例尺
+        const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
+
+        // 绘制圆形区域
+        const nodes = svg.selectAll(".node")
+            .data(bookCounts)
+            .enter()
+            .append("g")
+            .attr("class", "node")
+            .attr("data-name", d => d.name); // 添加数据绑定属性
+
+        nodes.append("circle")
+            .attr("r", d => d.radius)
+            .attr("fill", d => colorScale(d.name))
+            .attr("stroke", "black")
+            .attr("opacity", 1)
+            .on("click", function(event, d) {
+                // 切换选中状态
+                const isSelected = d3.select(this).classed("selected");
+                d3.select(this).classed("selected", !isSelected);
+
+                // 更新图表状态
+                updateChart();
+            });
+
+        nodes.append("text")
+            .attr("class", "book-name")
+            .attr("x", 0) // 文本水平居中
+            .attr("y", 0) // 文本垂直居中
+            .attr("text-anchor", "middle") // 文本水平居中
+            .attr("dominant-baseline", "middle") // 文本垂直居中
+            .text(d => d.name) // 显示史书名字
+            // .style("font-size", "12px")
+            // .style("fill", "black");
+
+        // 绘制散点
+        nodes.each(function(book) {
+            const node = d3.select(this);
+            filteredData[book.name].forEach((d, j) => {
+                node.append("circle")
+                    .attr("cx", (Math.random() - 0.5) * book.radius * 1.5)
+                    .attr("cy", (Math.random() - 0.5) * book.radius * 1.5)
+                    .attr("r", 3)
+                    .attr("fill", "white")
+                    .attr("class", "scatter")
+                    .attr("data-name", book.name); // 添加数据绑定属性
+            });
+        });
+
+
+        // 力导向图模拟
+        const simulation = d3.forceSimulation(bookCounts)
+            .force("charge", d3.forceManyBody().strength(10)) // 增加排斥力
+            .force("center", d3.forceCenter(width / 2, height / 2)) // 中心力
+            .force("collision", d3.forceCollide().radius(d => d.radius + 5)) // 碰撞检测
+            .force("x", d3.forceX(width / 2).strength(0.1)) // X 轴约束
+            .force("y", d3.forceY(height / 2).strength(0.1)) // Y 轴约束
+            .on("tick", ticked);
+
+        // 更新节点位置
+        function ticked() {
+            nodes.attr("transform", d => {
+                // 限制节点在画布范围内
+                const x = Math.max(d.radius, Math.min(width - d.radius, d.x));
+                const y = Math.max(d.radius, Math.min(height - d.radius, d.y));
+                return `translate(${x}, ${y})`;
             });
         }
 
-        // Filter data
-        if (selectedCategory !== "all") {
-            books = books.filter(d => d.history === selectedCategory);
+        // 更新图表状态
+        function updateChart() {
+            console.log("Updating chart...");
+
+            nodes.select("circle")
+                .attr("fill", d => {
+                    const legendItem = d3.select(`.legend-item[data-name='${d.name}']`);
+                    const isSelected = legendItem.classed("selected");
+                    console.log(`Node ${d.name}: selected = ${isSelected}`);
+                    return isSelected ? colorScale(d.name) : "#ccc";
+                })
+                .attr("opacity", d => {
+                    const legendItem = d3.select(`.legend-item[data-name='${d.name}']`);
+                    const isSelected = legendItem.classed("selected");
+                    return isSelected ? 1 : 0.5;
+                });
+
+            nodes.selectAll(".scatter")
+                .attr("fill", d => {
+                    const legendItem = d3.select(`.legend-item[data-name='${d.name}']`);
+                    const isSelected = legendItem.classed("selected");
+                    return isSelected ? "white" : "#999";
+                });
         }
 
-        // Color scale
-        let histories = [...new Set(books.map(d => d.history))];
-        let color = d3.scaleOrdinal()
-            .domain(histories)
-            .range(d3.schemeSet2);
+        // 添加图例
+        const legend = d3.select("#legend");
 
-        // Force simulation
-        let simulation = d3.forceSimulation(books)
-            .force("charge", d3.forceManyBody().strength(-60)) // 增加斥力强度
-            .force("center", d3.forceCenter(width / 2, height / 2))
-            .force("collision", d3.forceCollide().radius(20)) // 调整碰撞半径
-            .force("x", d3.forceX(width / 2).strength(0.1)) // 增加水平对齐的强度
-            .force("y", d3.forceY(height / 2).strength(0.1)) // 增加垂直对齐的强度
-            .force("boundary", forceBoundary(width, height, books)); // 边界限制
+        // 生成图例项
+        legend.selectAll(".legend-item")
+              .data(bookCounts)
+              .enter()
+              .append("div")
+              .attr("class", "legend-item")
+              .attr("data-name", d => d.name)
+              .html(d => `
+                  <div style="display: inline-block; width: 15px; height: 15px; background-color: ${colorScale(d.name)};"></div>
+                  <span>${d.name}</span>
+              `)
+              .on("click", function(event, d) {
+                  console.log(`Clicked on ${d.name}`);
+                  const isSelected = d3.select(this).classed("selected");
+                  d3.select(this).classed("selected", !isSelected);
+                  updateChart();
+              });
 
-        // Draw circles
-        let circles = svg.selectAll("circle")
-            .data(books)
-            .enter()
-            .append("circle")
-            .attr("r", 8)
-            .attr("fill", d => color(d.history))
-            .on("mouseover", showDetails)
-            .on("mouseout", hideDetails);
+      // 打印生成的图例项
+      console.log("Legend items:", legend.selectAll(".legend-item").nodes());
 
-        // Update node positions
-        simulation.on("tick", () => {
-            circles
-                .attr("cx", d => d.x)
-                .attr("cy", d => d.y);
-        });
 
-        // Legend
-        let legend = svg.append("g")
-            .attr("class", "legend")
-            .selectAll("g")
-            .data(histories)
-            .enter()
-            .append("g")
-            .attr("transform", (d, i) => `translate(0,${100 + i * 20})`);
+      const legendItems = legend.selectAll(".legend-item").nodes();
+      const totalHeight = legendItems.reduce((sum, item) => sum + item.offsetHeight, 0);
 
-        legend.append("rect")
-            .attr("x", width + 25)
-            .attr("width", 18)
-            .attr("height", 18)
-            .attr("fill", d => color(d));
+      // 设置图例容器高度（两列高度为总高度的一半）
+      legend.style("height", `${totalHeight / 2 + 100}px`); // 增加 20px 的 padding
 
-        legend.append("text")
-            .attr("x", width + 50)
-            .attr("y", 9)
-            .attr("dy", ".35em")
-            .text(d => d);
+      console.log(`Legend height set: ${totalHeight / 2 + 20}px`);
 
-        // Details panel
-        function showDetails(event, d) {
-            d3.select("#details")
-                .html(`
-                    <h3>${d.title}</h3>
-                    <p><strong>类别:</strong> ${d.category}</p>
-                    <p><strong>版本类型:</strong> ${d.version_type}</p>
-                    <p><strong>出版时间:</strong> ${d.publication_time}</p>
-                    <p><strong>四部分类:</strong> ${d.four_part_classification}</p>
-                    <p><strong>馆藏省份:</strong> ${d.library_province}</p>
-                `)
-                .style("display", "block");
-        }
 
-        function hideDetails(event, d) {
-            d3.select("#details").style("display", "none");
-        }
+      const h1 = d3.select("h1");
+      console.log("h1 text-align:", h1.style("text-align"));
+
+        // 添加工具提示
+        d3.select("body").append("div")
+            .attr("class", "tooltip");
+    }).catch(function(error) {
+        console.error("加载数据失败:", error);
     });
 }
-
-  // Boundary force function
-  function forceBoundary(width, height, nodes) {
-      return function force() {
-          for (let i = 0, n = nodes.length; i < n; ++i) {
-              let node = nodes[i];
-              node.x = Math.max(10, Math.min(width - 10, node.x)); // Keep nodes within horizontal bounds
-              node.y = Math.max(10, Math.min(height - 10, node.y)); // Keep nodes within vertical bounds
-          }
-      };
-  }
-
 
 
 
 // 页面 4 的折线图初始化函数
 function initializeChartPageTypeDist() {
     d3.json("assets/data2.json").then(data => {
-  
+
       const margin = { top: 50, right: 80, bottom: 50, left: 80 };
       const width = 800 - margin.left - margin.right;
       const height = 500 - margin.top - margin.bottom;
-  
+
       const svg = d3.select("svg")
                     .append("g")
                     .attr("transform", `translate(${margin.left},${margin.top})`);
-  
+
       // 2. 定义 X 轴和 Y 轴
       const xScale = d3.scaleBand()
                       .domain(data.map(d => d.type))
                       .range([0, width])
                       .padding(0.1);  // 设置柱状图之间的间隙
-  
+
       // 调整 yScale 的 domain，使得最小值稍微大于 0，确保0的柱可以显示
       const yScale = d3.scaleLinear()
                       .domain([-5, d3.max(data, d => Math.max(d["宋代"], d["元代"], d["明代"], d["清代"], d["民国"], d["现代"]))])  // 稍微扩大最大值
                       .range([height, 0]);
-  
+
       // 3. 画 X 轴和 Y 轴
       svg.append("g")
          .attr("transform", `translate(0, ${height})`)
          .call(d3.axisBottom(xScale))
          .style("font-size", "24px")
          .style("font-family", "KaiTi");
-  
+
       // 设定 y 轴，并使用百分号格式化
       const yAxis = d3.axisLeft(yScale)
                       .ticks(5)  // 设置刻度数
                       .tickFormat(d => `${d}%`); // 添加百分号
-  
+
       svg.append("g")
          .call(yAxis)
          .style("font-size", "24px");
-  
+
       // 4. 定义颜色
       const colors = {
         "宋代": "#8D4BBB",
@@ -307,11 +367,11 @@ function initializeChartPageTypeDist() {
         "民国": "#177CB0",
         "现代": "#F20C00"
       };
-  
+
       // 5. 画柱状图
       const categories = ["宋代", "元代", "明代", "清代", "民国", "现代"];
       const visibility = { "宋代": true, "元代": true, "明代": true, "清代": true, "民国": true, "现代": true };
-  
+
       categories.forEach(category => {
         // 为每个类别创建一组柱状图
         svg.selectAll(`.bar.${category}`)
@@ -330,11 +390,11 @@ function initializeChartPageTypeDist() {
            .delay((d, i) => i * 200) // 每个柱状图逐步显现
            .style("opacity", 1); // 过渡显示柱状图
       });
-  
+
       // 6. 创建折线选择按钮（控制柱状图的显示和隐藏）
       const buttonContainer = svg.append("g")
                                  .attr("transform", `translate(0, ${height + 80})`);
-  
+
       categories.forEach((category, i) => {
         buttonContainer.append("rect")
                        .attr("x", i * 100 + 30)
@@ -347,7 +407,7 @@ function initializeChartPageTypeDist() {
                            visibility[category] = !visibility[category]; // 切换可见性
                            d3.selectAll(`.bar.${category}`).style("display", visibility[category] ? "block" : "none");
                        });
-  
+
         buttonContainer.append("text")
                        .attr("x", i * 100 + 70)
                        .attr("y", 35)
@@ -357,7 +417,6 @@ function initializeChartPageTypeDist() {
                        .style("font-family", "KaiTi", "STKaiti", "楷体", "Kaiti SC")
                        .text(category);
       });
-  
+
     });
   }
-  
