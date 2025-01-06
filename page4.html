@@ -94,21 +94,15 @@
   }
 }
 
-    /* 右侧D3可视化区域 */
-    .chart-container {
-      width: 80%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+
 
     .chart-container {
       position: absolute;
-      left: 40%; /* 让它紧挨着左侧文本 */
-      top: 55%;
+      left:18%; /* 让它紧挨着左侧文本 */
+      top: 60%;
       transform: translateY(-50%);
-      width: 60%; /* 右侧占比 65% */
-      height: 80vh; /* 让图表不会超出 */
+      width: 100%; /* 右侧占比 65% */
+      height: 100vh; /* 让图表不会超出 */
       display: flex;
       align-items: center;
       justify-content: center;
@@ -129,25 +123,38 @@
     .legend text {
       cursor: pointer;
     }
-
+    #tooltip {
+        position: absolute;
+        pointer-events: none; /* 允许鼠标事件穿透 */
+        opacity: 0;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        font-size: 14px;
+        z-index: 1000; /* 确保 tooltip 在最上层 */
+        max-width: 300px; 
+      }
   </style>
 </head>
 <body>
   <div class="cover-title">
-    <h2>刊刻类型-时代分布</h2>
+    <h2>馆藏-地域分布</h2>
   </div>
   <!-- 左侧文本 -->
   <div class="cover-text">
-    <p>这些刊刻类型的时代分布，既是传统印刷和手工传抄在历史上兴衰起伏的
-      写照，也映射出印刷技术革命与社会文化需求变化对书籍生产形式的深刻影响。
-      从早期的刻本与手抄本盛行，到明清时期的修订校本繁荣，再到民国、现代借
-      由新式印刷而产出的印本兴起，这些变化的柱状分布共同勾勒出一幅古籍传承
-      与刊刻方式的历史变迁轨迹。</p>
+    <p>从地图上可见，资源的集中度主要沿着经济与文化发达地区聚拢；从前五名
+        的城市来看，这些馆藏量最高的地点无一例外地位于中国的传统文化中心与现
+        代化学术交流枢纽。这一分布格局折射出历史与现实的双重影响：一方面，传
+        统文献在历史上多集中于政治、文化与教育的重心地区；另一方面，现代信息
+        与文献资源的建设也显然向经济文化发达城市倾斜。</p>
   </div>
+  <div id="tooltip"></div>
 
   <!-- 右侧D3折线图 -->
   <div class="chart-container">
-    <svg width="800" height="500"></svg>
+    <svg id="map"></svg>
   </div>
 
 </body>

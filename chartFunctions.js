@@ -312,6 +312,25 @@ function initializeChartPage2() {
         // 添加工具提示
         d3.select("body").append("div")
             .attr("class", "tooltip");
+
+            createLegend(svg, width, height, legendWidth, legendHeight, legendMargin, colorScale, colorInterpolator, maxQuantity, zeroColor);
+
+            // 窗口大小调整时更新地图尺寸和图例位置
+            window.addEventListener("resize", () => {
+              const newWidth = window.innerWidth;
+              const newHeight = window.innerHeight;
+      
+              svg
+                .attr("width", newWidth)
+                .attr("height", newHeight);
+      
+              projection.fitSize([newWidth, newHeight], geoData);
+              svg.selectAll("path").attr("d", path);
+      
+              // 更新图例的位置
+              svg.select(".legend")
+                .attr("transform", `translate(${newWidth - legendWidth - legendMargin.right}, ${legendMargin.top})`);
+            });
     }).catch(function(error) {
         console.error("加载数据失败:", error);
     });
