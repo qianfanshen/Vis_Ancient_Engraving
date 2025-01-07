@@ -159,7 +159,7 @@ let customColors = [
     ];
 
 function loadData() {
-    d3.json("assets/data.json").then(function(data) {
+    d3.json("assets/data_all.json").then(function(data) {
         globalData = data;
     }).catch(function(error) {
         console.error("加载数据失败:", error);
@@ -370,11 +370,13 @@ function switchToV1() {
             .html(
                 `<strong>${d.title}</strong><br>
                 类别: ${d.category || "未知"}<br>
-                版本类型: ${d.version_type || "未知"}<br>
+                古籍版本: ${d.ancient_version || "未知"}<br>
+                刊刻类型: ${d.version_type || "未知"}<br>
                 刊刻时间: ${d.publication_time || "未知"}<br>
                 刊刻地点: ${d.publication_location || "未知"}<br>
                 四部分类: ${d.four_part_classification || "未知"}<br>
-                馆藏省份: ${d.library_province || "未知"}`
+                馆藏省份: ${d.library_province || "未知"}<br>
+                馆藏信息: ${d.library_info || "未知"}`
             )
             .style("left", (event.pageX + 10) + "px")
             .style("top", (event.pageY - 10) + "px");
@@ -544,11 +546,13 @@ function drawChartPage3_v2(selectedCategory = "all") {
                 .html(
                     `<strong>${d.title}</strong><br>
                     类别: ${d.category || "未知"}<br>
-                    版本类型: ${d.version_type || "未知"}<br>
+                    古籍版本: ${d.ancient_version || "未知"}<br>
+                    刊刻类型: ${d.version_type || "未知"}<br>
                     刊刻时间: ${d.publication_time || "未知"}<br>
                     刊刻地点: ${d.publication_location || "未知"}<br>
                     四部分类: ${d.four_part_classification || "未知"}<br>
-                    馆藏省份: ${d.library_province || "未知"}`
+                    馆藏省份: ${d.library_province || "未知"}<br>
+                    馆藏信息: ${d.library_info || "未知"}`
                 )
                 .style("left", (event.pageX + 10) + "px")
                 .style("top", (event.pageY - 10) + "px");
