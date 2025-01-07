@@ -31,7 +31,7 @@ const bookTitles = [
 ];
 
 function loadData() {
-    d3.json("assets/data.json").then(function(data) {
+    d3.json("assets/data_all.json").then(function(data) {
         globalData = data;
     }).catch(function(error) {
         console.error("加载数据失败:", error);
