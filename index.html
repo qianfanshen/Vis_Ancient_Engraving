@@ -78,7 +78,7 @@
 
   <script>
     // 每次在这里添加新的页面即可
-    const files = ['cover.html', 'page1.html', 'page2.html', 'page3.html', 'page_type_dist.html', 'page4.html', 'map_main.html']; // 页面内容文件
+    const files = ['cover.html', 'page1.html', 'page3.html', 'page2.html', 'page_type_dist.html', 'page4.html', 'map_main.html']; // 页面内容文件
     let currentPage = 0; // 当前页面索引
     let isScrolling = false; // 防止滚动事件频繁触发
     const upArrow = document.getElementById('upArrow');
@@ -97,21 +97,22 @@ function loadPage(index) {
     downArrow.style.display = index === files.length - 1 ? 'none' : 'block';
 
     if (index === 2) {
-      initializeChartPage2(); // 页1初始化
-    } else if (index === 3) {
       initializev1position(); // 页2初始化
-        initializev2position();
-        drawChartPage3_v2(); // 页3初始化
-        let isV1 = false; // 当前布局状态
+      initializev2position();
+      drawChartPage3_v2(); // 页3初始化
+      let isV1 = false; // 当前布局状态
 
-        document.getElementById("toggle-button").addEventListener("click", function () {
-          if(!isV1) {
-            switchToV1();
-          } else {
-            switchToV2();
-          }
-          isV1 = !isV1; // 切换状态
-        });
+      document.getElementById("toggle-button").addEventListener("click", function () {
+        if (!isV1) {
+          switchToV1();
+        } else {
+          switchToV2();
+        }
+        isV1 = !isV1; // 切换状态
+      });
+
+    } else if (index === 3) {
+        initializeChartPage2(); // 页1初始化
     } else if (index === 4) {
       initializeChartPageTypeDist();
     } else if (index === 5) {
