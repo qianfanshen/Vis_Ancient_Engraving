@@ -77,7 +77,7 @@
         color: white;
         transform: scale(1.1);
     }
-    
+
     /* 左侧文本区域 */
     .cover-title {
       position: absolute;
@@ -93,11 +93,11 @@
       line-height: 0.3;
       text-align: justify;
       animation: fadeIn 2s ease-in-out forwards;
-    
+
       /* 删除 border-bottom */
       margin-bottom: 0px; /* 设置合适的间距，调整距离 */
     }
-    
+
     /* 动画：直线从左到右 */
     .cover-title:after {
       content: ""; /* 创建伪元素 */
@@ -108,7 +108,7 @@
       margin-top: 10px; /* 控制字与下划线的距离 */
       animation: lineAnimation 2s ease-in-out forwards; /* 动效 */
     }
-  
+
   /* 动画：直线从左到右 */
   @keyframes lineAnimation {
       from {
@@ -129,7 +129,7 @@
       align-items: center;
       justify-content: center;
   }
-  
+
   /* 让 SVG 自适应 chart-container */
   svg {
       transform: scale(0.8);
@@ -157,13 +157,36 @@
         box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
         font-size: 14px;
         z-index: 1000; /* 确保 tooltip 在最上层 */
-        max-width: 300px; 
+        max-width: 300px;
       }
+
+    .image-button {
+        background: none;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        transition: filter 0.3s ease;
+        margin: 10px; /* 按钮之间的间距 */
+    }
+
+    .image-button img {
+        width: 100px;
+        height: 100px;
+        filter: grayscale(100%);
+        transition: filter 0.3s ease;
+    }
+
+    .image-button.active img {
+        filter: grayscale(0%);
+    }
+    .image-button.initial img {
+        filter: grayscale(0%);
+    }
   </style>
 </head>
 <body>
   <div class="cover-title">
-    <h2>馆藏-地域分布</h2>
+    <h2>古籍刊刻信息</h2>
   </div>
   <div class="button-container">
     <button class="image-button" data-id="1">
