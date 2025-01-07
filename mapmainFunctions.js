@@ -281,6 +281,8 @@ function map_dynasty(dynasty) {
     return 4;
   }else if (dynasty == "现代") {
     return 5;
+  } else {
+    return -1;
   }
 }
 
