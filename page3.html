@@ -15,6 +15,7 @@
       margin: 0;
       padding: 0;
     }
+
     /* 左侧文本区域 */
     .cover-title {
       position: absolute;
@@ -22,35 +23,40 @@
       top: 10%;
       transform: translateY(-50%);
       font-size: clamp(30px, 2vw, 66px);
-      color: #8B0000; /* 棕红色 */
-      font-family: 'MyCustomFont',"KaiTi", "STKaiti", "楷体", "Kaiti SC", serif;
+      color: #8B0000;
+      /* 棕红色 */
+      font-family: 'MyCustomFont', "KaiTi", "STKaiti", "楷体", "Kaiti SC", serif;
       max-width: 30vw;
       max-height: 40vh;
       overflow-y: auto;
       line-height: 0.3;
       text-align: justify;
       animation: fadeIn 2s ease-in-out forwards;
-
-      /* 删除 border-bottom */
-      margin-bottom: 0px; /* 设置合适的间距，调整距离 */
+      margin-bottom: 0px;
+      /* 设置合适的间距，调整距离 */
     }
 
     /* 动画：直线从左到右 */
     .cover-title:after {
-      content: ""; /* 创建伪元素 */
+      content: "";
+      /* 创建伪元素 */
       display: block;
-      width: 0; /* 初始宽度为 0 */
+      width: 0;
+      /* 初始宽度为 0 */
       height: 3px;
-      background-color: #8B0000; /* 下划线的颜色 */
-      margin-top: 10px; /* 控制字与下划线的距离 */
-      animation: lineAnimation 2s ease-in-out forwards; /* 动效 */
+      background-color: #8B0000;
+      /* 下划线的颜色 */
+      margin-top: 10px;
+      /* 控制字与下划线的距离 */
+      animation: lineAnimation 2s ease-in-out forwards;
+      /* 动效 */
     }
 
-
-  @keyframes lineAnimation {
+    @keyframes lineAnimation {
       from {
-          width: 0;
+        width: 0;
       }
+
       to {
         width: 100%;
       }
@@ -60,115 +66,155 @@
     .cover-text {
       position: absolute;
       left: 5%;
-      top: 50%; /* 让内容从中间开始 */
-      transform: translateY(-50%); /* 垂直居中 */
-      font-size: clamp(18px, 2vw, 26px); /* 限制字体大小，适应不同屏幕 */
+      top: 50%;
+      /* 让内容从中间开始 */
+      transform: translateY(-50%);
+      /* 垂直居中 */
+      font-size: clamp(18px, 2vw, 26px);
+      /* 限制字体大小，适应不同屏幕 */
       color: #333;
       font-family: "KaiTi", "STKaiti", "楷体", "Kaiti SC", serif;
-      max-width: 30vw; /* 限制最大宽度，防止超出 */
-      max-height: 80vh; /* 限制最大高度，防止超出 */
-      overflow-y: auto; /* 如果内容超出，则显示滚动条 */
+      max-width: 30vw;
+      /* 限制最大宽度，防止超出 */
+      max-height: 80vh;
+      /* 限制最大高度，防止超出 */
+      overflow-y: auto;
+      /* 如果内容超出，则显示滚动条 */
       line-height: 1.8;
       text-align: justify;
       word-break: break-word;
-      padding-right: 10px; /* 预留滚动条空间，避免文本挤压 */
+      padding-right: 10px;
+      /* 预留滚动条空间，避免文本挤压 */
       animation: fadeIn 2s ease-in-out forwards;
-  }
-  @keyframes fadeIn {
-    from {
+    }
+
+    @keyframes fadeIn {
+      from {
         opacity: 0;
         transform: translateY(-50%) scale(0.8);
-    }
-    to {
+      }
+
+      to {
         opacity: 1;
         transform: translateY(-50%) scale(1);
+      }
     }
-}
-@keyframes fadeInUp {
-  from {
-      opacity: 0;
-      transform: translateY(100vh); /* 从屏幕底部开始 */
-  }
-  to {
-      opacity: 1;
-      transform: translateY(0);
-  }
-}
 
-  #page3-container {
-        max-width: 1400px;
-        margin-top: 200 auto;
-        padding: 20px;
-        text-align: center;
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(100vh);
+        /* 从屏幕底部开始 */
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    #page3-container {
+      max-width: 1400px;
+      margin-top: 200 auto;
+      padding: 20px;
+      text-align: center;
     }
 
     #content {
-        display: flex;
-        justify-content: flex-start; /* 左对齐 */
-        align-items: flex-start;
-        position: absolute;
-        margin-left: 50px; /* 矩形区域居中偏左 100px */
-    }
+      width: 100%;
+      display: flex;
+      justify-content: flex-start;
+      /* 左对齐 */
+      align-items: flex-start;
+      position: absolute;
+      margin-left: 0px;
+      padding: 0; /* 确保没有额外的 padding */
+  }
 
     #chart {
-        width: 1000px;  /* 矩形区域占 70% 宽度 */
-        height: 600px;
-        position: absolute;
-        margin-top: 110px;
+      width: 1200px;
+      /* 矩形区域占 70% 宽度 */
+      height: 600px;
+      position: absolute;
+      margin-top: 110px;
+      left: 50px;
     }
 
     #legend {
-        width: 250px; /* 增加图例容器宽度 */
-        padding: 10px;
-        position: absolute;
-        left: 900px; /* 矩形区域宽度 (800px) + 右边距 (100px) */
-        top: 0;
-        column-count: 2; /* 将图例分为两列 */
-        column-gap: 20px; /* 列之间的间距 */
-        background-color: #fff; /* 背景颜色 */
-        border: 1px solid #ddd; /* 边框 */
-        z-index: 10; /* 确保图例在最上层 */
-        visibility: visible; /* 确保图例可见 */
-        margin-top: 110px;
+      width: 450px;
+      /* 增加图例容器宽度 */
+      padding: 10px;
+      position: absolute;
+      left: 1100px;
+      /* 矩形区域宽度 (800px) + 右边距 (100px) */
+      top: 100;
+      column-count: 3;
+      /* 将图例分为两列 */
+      column-gap: 25px;
+      /* 列之间的间距 */
+      z-index: 10;
+      /* 确保图例在最上层 */
+      visibility: visible;
+      /* 确保图例可见 */
+      margin-top: 150px;
     }
 
     .legend-item {
-        display: flex;
-        align-items: center;
-        margin-bottom: 10px;
-        cursor: pointer;
-        break-inside: avoid; /* 防止图例项被分割到不同列 */
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+      cursor: pointer;
+      break-inside: avoid;
+      /* 防止图例项被分割到不同列 */
+      gap: 10px;
+      font-size: 15px !important;
     }
 
     .legend-item rect {
-        width: 15px;
-        height: 15px;
-        margin-right: 5px;
-    }
-
-    .legend-item text {
-        font-size: 12px;
+      width: 15px;
+      height: 15px;
     }
 
     .tooltip {
-        position: absolute;
-        background-color: rgba(0, 0, 0, 0.8);
-        color: #fff;
-        padding: 10px;
-        border-radius: 5px;
-        pointer-events: none;
-        font-size: 14px;
-        display: none;
+      position: absolute;
+      background-color: rgba(0, 0, 0, 0.8);
+      color: #fff;
+      padding: 10px;
+      border-radius: 5px;
+      pointer-events: none;
+      font-size: 14px;
+      display: none;
     }
 
     .book-name {
-        font-size: 20px;
-        fill: black; /* 文本颜色 */
-        text-anchor: middle; /* 文本水平居中 */
-        dominant-baseline: middle; /* 文本垂直居中 */
-        pointer-events: none; /* 防止文本干扰交互 */
-        font-weight: bold; /* 加粗文字 */
-        font-family: "KaiTi", "STKaiti", "楷体", "Kaiti SC", serif;
+      font-size: 18px !important;
+      fill: black;
+      /* 文本颜色 */
+      text-anchor: middle;
+      /* 文本水平居中 */
+      dominant-baseline: middle;
+      /* 文本垂直居中 */
+      pointer-events: none;
+      /* 防止文本干扰交互 */
+      font-weight: bold;
+      /* 加粗文字 */
+      font-family: "KaiTi", "STKaiti", "楷体", "Kaiti SC", serif;
+    }
+
+    /* 新增按钮样式 */
+    #toggle-button {
+      position: absolute;
+      top: 20px;
+      right: 100px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #8B0000;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      z-index: 1000;
+      /* 确保按钮在最上层 */
     }
   </style>
 </head>
@@ -180,13 +226,21 @@
   <div id="page3-container">
     <div id="content">
       <div id="chart"></div> <!-- 矩形区域 -->
+      <div id="tooltip"></div>
       <div id="legend"></div> <!-- 图例 -->
     </div>
   </div>
+  <!-- 新增切换按钮 -->
+  <button id="toggle-button">切换视图</button>
+
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script src="assets/data.json"></script>
   <script src="chartFunctions.js"></script>
-
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      initializeChartPage3_v2(); // 初始化 v2 视图
+    });
+  </script>
 </body>
 
 </html>

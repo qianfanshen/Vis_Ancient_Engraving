@@ -85,27 +85,36 @@
     // 加载页面内容
     // 加载页面内容（添加滑动翻页动画）
 // 直接切换页面，无动画
-function loadPage(index) {
-  d3.html(files[index]).then(content => {
-    d3.select('#content').html(''); // 清空当前内容
-    d3.select('#content').node().append(content.documentElement); // 直接替换内容
+  function loadPage(index) {
+    d3.html(files[index]).then(content => {
+      d3.select('#content').html(''); // 清空当前内容
+      d3.select('#content').node().append(content.documentElement); // 直接替换内容
 
-    // 更新箭头可见性
-    upArrow.style.display = index === 0 ? 'none' : 'block';
-    downArrow.style.display = index === files.length - 1 ? 'none' : 'block';
+      // 更新箭头可见性
+      upArrow.style.display = index === 0 ? 'none' : 'block';
+      downArrow.style.display = index === files.length - 1 ? 'none' : 'block';
 
-    if (index === 2) {
-      initializeChartPage2(); // 页1初始化
-    } else if (index === 3) {
-      initializeChartPage3(); // 页2初始化
-    } else if (index === 4) {
-      initializeChartPageTypeDist();
-    }
-  });
-}
+      if (index === 2) {
+        initializeChartPage2(); // 页1初始化
+      } else if (index === 3) {
+        initializev1position(); // 页2初始化
+        initializev2position();
+        drawChartPage3_v2(); // 页3初始化
+        let isV1 = false; // 当前布局状态
 
-
-
+        document.getElementById("toggle-button").addEventListener("click", function () {
+          if(!isV1) {
+            switchToV1();
+          } else {
+            switchToV2();
+          }
+          isV1 = !isV1; // 切换状态
+        });
+      } else if (index === 4) {
+        initializeChartPageTypeDist();
+      }
+    });
+  }
 
     loadPage(currentPage);
 
