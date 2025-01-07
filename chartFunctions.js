@@ -623,7 +623,7 @@ function drawChartPage3_v2(selectedCategory = "all") {
     console.log("Legend items:", legend.selectAll(".legend-item").nodes());
 
     const legendHeight = legendItems.nodes().reduce((sum, item) => sum + item.offsetHeight, 0);
-    legend.style("height", `${legendHeight / 2 + 20}px`); // 设置图例容器高度
+    legend.style("height", `${legendHeight / 2 + 120}px`); // 设置图例容器高度
 
     console.log(`Legend height set: ${legendHeight / 2 + 20}px`);
 }
