@@ -2,6 +2,8 @@ let globalData = null;
 let rawGeoData = null;
 let selectedCategories = [];
 let flag = true;
+let minValue = 0;
+let maxValue = 5;
 
 const bookTitles = [
   "史记",
@@ -43,7 +45,22 @@ function loadData() {
     });
 }
 
-// 统计各省份的古籍数量
+function convertToGeoJSON(rawData) {
+    return {
+      "type": "FeatureCollection",
+      "features": rawData.map(item => ({
+        "type": "Feature",
+        "properties": {
+          "name": item.Name
+        },
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": item.Geometry // 假设 Geometry 是一个有效的多边形数组
+        }
+      }))
+    };
+  }
+
 function countByProvince(filteredData) {
   const provinceCounts = {}; // 存储各省份的古籍数量
 
@@ -65,6 +82,33 @@ function countByProvince(filteredData) {
   return provinceCounts;
 }
 
+// 统计各省份的古籍数量和书籍名称
+function countByTitle(filteredData) {
+  const provinceData = {}; // 存储各省份的古籍数量和书籍名称
+
+  // 遍历筛选后的数据
+  Object.values(filteredData).forEach(books => {
+    books.forEach(book => {
+      const province = book.publication_location; // 获取馆藏省份
+      if (province) {
+        // 如果省份存在，更新数据
+        if (!provinceData[province]) {
+          // 如果省份尚未记录，初始化数据结构
+          provinceData[province] = {
+            count: 0,
+            books: [],
+          };
+        }
+        // 更新计数和书籍名称列表
+        provinceData[province].count++;
+        provinceData[province].books.push(book.title); // 假设书籍名称存储在 title 字段
+      }
+    });
+  });
+
+  return provinceData;
+}
+
 loadData();
 
 // 过滤数据的函数（支持多类别）
@@ -82,25 +126,27 @@ function filterDataByCategories(data, selectedCategories) {
                 filteredData[category] = data[category];
             }
         });
-    console.log('filteredData:', filteredData);
+    // console.log('filteredData:', filteredData);
         return filteredData;
     }
 }
 
+function filterDataByDynasty(data, minDynasty, maxDynasty) {
+  const filteredData = {};
 
-
-function initializeMapMainPage() {
-  const data = globalData;
-  const geoData = convertToGeoJSON(rawGeoData);
-
-
-  const buttons = document.querySelectorAll('.image-button');
-  buttons.forEach(button => {
-    button.classList.add('initial'); // 初始状态为选中
+  Object.entries(data).forEach(([category, books]) => {
+    filteredData[category] = books.filter(book => {
+      const dynasty = book.publication_time;
+      return map_dynasty(dynasty) >= minDynasty && map_dynasty(dynasty) <= maxDynasty;
+    });
   });
 
+  return filteredData;
+}
 
-  const filteredData = filterDataByCategories(data, selectedCategories);
+function draw(geoData, data, selectedCategories, minDynasty, maxDynasty) {
+  const NewData = filterDataByDynasty(data, minDynasty, maxDynasty);
+  const filteredData = filterDataByCategories(NewData, selectedCategories);
   const provinceCounts = countByProvince(filteredData);
   const quantityMap = new Map(Object.entries(provinceCounts));
 
@@ -151,6 +197,63 @@ function initializeMapMainPage() {
     .attr("stroke", "black")
     .attr("stroke-width", 0.5);
 
+
+  const libraryMap = countByTitle(filteredData)
+
+  // 获取 tooltip 元素
+  const tooltip = d3.select("#tooltip")
+    .style("pointer-events", "auto");
+
+  // 监听 wheel 事件
+  tooltip.on("wheel", function(event) {
+    //event.preventDefault(); // 阻止默认的页面滚动行为
+    const delta = event.deltaY || event.detail || event.wheelDelta; // 获取滚轮滚动的方向
+    this.scrollTop += delta; // 调整工具提示内容的滚动位置
+  }, { passive: false });
+
+  // 添加交互性：鼠标悬停显示名称和数量
+  svg.selectAll("path")
+    .on("mouseover", function(event, d) {
+      // 改变颜色
+      d3.select(this).attr("fill", "blue");
+
+      const provinceName = d.properties.name;
+
+      // 从 result 中获取该省份的数据
+      const provinceData = libraryMap[provinceName] || { count: 0, books: [] };
+
+      // 构建书籍列表
+      const bookList = provinceData.books.join('<br>');
+
+      // 显示并设置 tooltip 内容和位置
+      tooltip
+        .style("left", (event.pageX + 10) + "px")
+        .style("top", (event.pageY + 10) + "px")
+        .style("opacity", 1)
+        .html(`
+          <strong>${provinceName}</strong><br>
+          数量: ${provinceData.count}<br><br>
+          <strong>书籍列表:</strong><br>
+          ${bookList}
+        `)
+        .node().scrollTop = 0;
+    })
+    .on("mousemove", function(event) {
+      // 更新 tooltip 位置
+      tooltip
+        .style("left", (event.pageX + 10) + "px")
+        .style("top", (event.pageY + 10) + "px");
+    })
+    .on("mouseout", function(event, d) {
+      // 恢复颜色
+      const provinceName = d.properties.name;
+      const quantity = +quantityMap.get(provinceName) || 0;
+      d3.select(this).attr("fill", quantity > 0 ? color(quantity) : zeroColor);
+
+      // 隐藏 tooltip
+      tooltip.style("opacity", 0);
+    });
+
   // 窗口大小调整时更新地图尺寸
   window.addEventListener("resize", () => {
     const newWidth = window.innerWidth;
@@ -163,8 +266,59 @@ function initializeMapMainPage() {
     projection.fitSize([newWidth, newHeight], geoData);
     svg.selectAll("path").attr("d", path);
   });
+}
+
+function map_dynasty(dynasty) {
+  if (dynasty == "宋") {
+    return 0;
+  } else if (dynasty == "元") {
+    return 1;
+  } else if (dynasty == "明") {
+    return 2;
+  } else if (dynasty == "清") {
+    return 3;
+  } else if (dynasty == "民国") {
+    return 4;
+  }else if (dynasty == "现代") {
+    return 5;
+  }
+}
+
+
+function initializeMapMainPage() {
+  const data = globalData;
+  const geoData = convertToGeoJSON(rawGeoData);
+
+
+  const buttons = document.querySelectorAll('.image-button');
+  buttons.forEach(button => {
+    button.classList.add('initial'); // 初始状态为选中
+  });
+
+  // 获取滑块元素
+  const minSlider = document.getElementById('min-slider');
+  const maxSlider = document.getElementById('max-slider');
+  minValue = minSlider.value;
+  maxValue = maxSlider.value;
+
+  draw(geoData, data, selectedCategories, minValue, maxValue);
 
   // const buttons = document.querySelectorAll('.image-button');
+
+  // 监听 min-slider 的变化
+  minSlider.addEventListener('input', function () {
+      // 获取当前值
+      minValue = minSlider.value;
+      // 可以在这里添加其他逻辑
+      draw(geoData, data, selectedCategories, minValue, maxValue);
+  });
+
+  // 监听 max-slider 的变化
+  maxSlider.addEventListener('input', function () {
+      // 获取当前值
+      maxValue = maxSlider.value;
+      draw(geoData, data, selectedCategories, minValue, maxValue);
+  });
 
   // 为每个按钮绑定点击事件
   buttons.forEach(button => {
@@ -186,8 +340,7 @@ function initializeMapMainPage() {
 
       console.log('当前选中的类别:', selectedCategories);
 
-      // 过滤数据
-      const filteredData = filterDataByCategories(data, selectedCategories);
+      draw(geoData, data, selectedCategories, minValue, maxValue);
 
       if (flag) { // 如果是第一次点击
         buttons.forEach(button => {
@@ -198,219 +351,6 @@ function initializeMapMainPage() {
           button.classList.remove('initial');
         });
       }
-
-      const provinceCounts = countByProvince(filteredData);
-      const quantityMap = new Map(Object.entries(provinceCounts));
-
-      // 计算数量的最大值，忽略 0
-      const quantities = Array.from(quantityMap.values()).map(Number).filter(q => q > 0);
-      const maxQuantity = d3.max(quantities) || 1; // 确保 maxQuantity 至少为 1
-
-      // 地图宽高
-      const width = window.innerWidth;
-      const height = window.innerHeight;
-
-      // 设置SVG画布
-      d3.select("#map").html("");
-      const svg = d3.select("#map")
-        .attr("width", width)
-        .attr("height", height);
-
-      // 创建一个地理投影，适应于屏幕尺寸
-      const projection = d3.geoMercator()
-        .fitSize([width, height], geoData);
-
-      // 创建路径生成器
-      const path = d3.geoPath().projection(projection);
-
-      // 创建对数比例尺，基于数量数据
-      const color = d3.scaleSequential()
-        .domain([1, maxQuantity]) // 对数比例尺的域从 1 到最大值
-        .interpolator(d3.interpolateOrRd);
-
-      // 定义颜色用于数量为 0 的省份
-      const zeroColor = "#CCC"; // 灰色
-
-      // 绘制地图
-      svg.selectAll("path")
-        .data(geoData.features)
-        .enter()
-        .append("path")
-        .attr("d", path)
-        .attr("fill", function(d) {
-          // 获取省份名称
-          const provinceName = d.properties.name;
-          // 获取对应省份的数量
-          const quantity = +quantityMap.get(provinceName) || 0;
-          // 根据数量设置填充颜色
-          return quantity > 0 ? color(quantity) : zeroColor;
-        })
-        .attr("stroke", "black")
-        .attr("stroke-width", 0.5);
-
-      // 窗口大小调整时更新地图尺寸
-      window.addEventListener("resize", () => {
-        const newWidth = window.innerWidth;
-        const newHeight = window.innerHeight;
-
-        svg
-          .attr("width", newWidth)
-          .attr("height", newHeight);
-
-        projection.fitSize([newWidth, newHeight], geoData);
-        svg.selectAll("path").attr("d", path);
-      });
     });
   });
 }
-
-
-function OriinitializeMapMainPage(geoDataUrl, quantityDataUrl, libraryDataUrl) {
-    // 使用 Fetch API 加载省份数量数据和图书馆数据
-    Promise.all([fetch(geoDataUrl), fetch(quantityDataUrl), fetch(libraryDataUrl)])
-      .then(([geoResponse, quantityResponse, libraryResponse]) =>
-        Promise.all([geoResponse.json(), quantityResponse.json(), libraryResponse.json()])
-      )
-      .then(([rawGeoData, rawQuantityData, rawLibraryData]) => {
-        // 将原始地理数据转换为 GeoJSON 格式
-        const geoData = convertToGeoJSON(rawGeoData);
-
-        // 创建一个 Map 来存储省份名称和数量的对应关系
-        const quantityMap = new Map(Object.entries(rawQuantityData));
-
-        // 创建一个 Map 来存储每个省份对应的图书馆及数量
-        const libraryMap = new Map();
-        for (const [libraryName, libraryInfo] of Object.entries(rawLibraryData)) {
-          const { province, count } = libraryInfo;
-          if (!libraryMap.has(province)) {
-            libraryMap.set(province, []);
-          }
-          libraryMap.get(province).push({ libraryName, count });
-        }
-
-        // 计算数量的最大值，忽略 0
-        const quantities = Array.from(quantityMap.values()).map(Number).filter(q => q > 0);
-        const maxQuantity = d3.max(quantities) || 1; // 确保 maxQuantity 至少为 1
-
-        // 地图宽高
-        const width = window.innerWidth;
-        const height = window.innerHeight;
-
-        // 设置SVG画布
-        const svg = d3.select("#map")
-          .attr("width", width)
-          .attr("height", height);
-
-        // 创建一个地理投影，适应于屏幕尺寸
-        const projection = d3.geoMercator()
-          .fitSize([width, height], geoData);
-
-        // 创建路径生成器
-        const path = d3.geoPath().projection(projection);
-
-        // 创建对数比例尺，基于数量数据
-        const color = d3.scaleSequential()
-          .domain([1, maxQuantity]) // 对数比例尺的域从 1 到最大值
-          .interpolator(d3.interpolateOrRd);
-
-        // 定义颜色用于数量为 0 的省份
-        const zeroColor = "#CCC"; // 灰色
-
-        // 绘制地图
-        svg.selectAll("path")
-          .data(geoData.features)
-          .enter()
-          .append("path")
-          .attr("d", path)
-          .attr("fill", function(d) {
-            // 获取省份名称
-            const provinceName = d.properties.name;
-            // 获取对应省份的数量
-            const quantity = +quantityMap.get(provinceName) || 0;
-            // 根据数量设置填充颜色
-            return quantity > 0 ? color(quantity) : zeroColor;
-          })
-          .attr("stroke", "black")
-          .attr("stroke-width", 0.5);
-
-        // 获取 tooltip 元素
-        const tooltip = d3.select("#tooltip");
-
-        // 添加交互性：鼠标悬停显示名称和数量
-        svg.selectAll("path")
-          .on("mouseover", function(event, d) {
-            // 改变颜色
-            d3.select(this).attr("fill", "orange");
-
-            // 获取省份名称和数量
-            const provinceName = d.properties.name;
-            const quantity = +quantityMap.get(provinceName) || 0;
-
-            // 获取该省份的所有图书馆及它们的数量
-            const libraries = libraryMap.get(provinceName) || [];
-
-            // 构建图书馆列表
-            const libraryList = libraries.map(lib => `${lib.libraryName}: ${lib.count}`).join('<br>');
-
-            // 显示并设置 tooltip 内容和位置
-            tooltip
-              .style("left", (event.pageX + 10) + "px")
-              .style("top", (event.pageY + 10) + "px")
-              .style("opacity", 1)
-              .html(`
-                <strong>${provinceName}</strong><br>
-                数量: ${quantity}<br><br>
-                <strong>图书馆:</strong><br>
-                ${libraryList}
-              `);
-          })
-          .on("mousemove", function(event) {
-            // 更新 tooltip 位置
-            tooltip
-              .style("left", (event.pageX + 10) + "px")
-              .style("top", (event.pageY + 10) + "px");
-          })
-          .on("mouseout", function(event, d) {
-            // 恢复颜色
-            const provinceName = d.properties.name;
-            const quantity = +quantityMap.get(provinceName) || 0;
-            d3.select(this).attr("fill", quantity > 0 ? color(quantity) : zeroColor);
-
-            // 隐藏 tooltip
-            tooltip.style("opacity", 0);
-          });
-
-        // 窗口大小调整时更新地图尺寸
-        window.addEventListener("resize", () => {
-          const newWidth = window.innerWidth;
-          const newHeight = window.innerHeight;
-
-          svg
-            .attr("width", newWidth)
-            .attr("height", newHeight);
-
-          projection.fitSize([newWidth, newHeight], geoData);
-          svg.selectAll("path").attr("d", path);
-        });
-      })
-      .catch(error => {
-        console.error('加载 JSON 文件失败:', error);
-      });
-  }
-
-  // 将原始数据转换为 GeoJSON 格式
-  function convertToGeoJSON(rawData) {
-    return {
-      "type": "FeatureCollection",
-      "features": rawData.map(item => ({
-        "type": "Feature",
-        "properties": {
-          "name": item.Name
-        },
-        "geometry": {
-          "type": "Polygon",
-          "coordinates": item.Geometry // 假设 Geometry 是一个有效的多边形数组
-        }
-      }))
-    };
-  }
