@@ -1,0 +1,218 @@
+{
+    "上海图书馆": {
+        "count": 115,
+        "province": "上海"
+    },
+    "浙江图书馆": {
+        "count": 12,
+        "province": "浙江"
+    },
+    "扬州市图书馆": {
+        "count": 2,
+        "province": "江苏"
+    },
+    "清华大学图书馆": {
+        "count": 1,
+        "province": "北京"
+    },
+    "吉林大学图书馆": {
+        "count": 3,
+        "province": "吉林"
+    },
+    "新疆大学图书馆": {
+        "count": 1,
+        "province": "新疆"
+    },
+    "兴化市图书馆": {
+        "count": 1,
+        "province": "江苏"
+    },
+    "山东省图书馆": {
+        "count": 6,
+        "province": "山东"
+    },
+    "国家图书馆": {
+        "count": 163,
+        "province": "北京"
+    },
+    "南京图书馆": {
+        "count": 47,
+        "province": "江苏"
+    },
+    "天津图书馆": {
+        "count": 29,
+        "province": "天津"
+    },
+    "南开大学图书馆": {
+        "count": 4,
+        "province": "天津"
+    },
+    "北京市文物局": {
+        "count": 2,
+        "province": "北京"
+    },
+    "福建省图书馆": {
+        "count": 5,
+        "province": "福建"
+    },
+    "常熟市图书馆": {
+        "count": 3,
+        "province": "江苏"
+    },
+    "湖北省图书馆": {
+        "count": 6,
+        "province": "湖北"
+    },
+    "中山大学图书馆": {
+        "count": 6,
+        "province": "广东"
+    },
+    "北京大学图书馆": {
+        "count": 35,
+        "province": "北京"
+    },
+    "辽宁省图书馆": {
+        "count": 4,
+        "province": "辽宁"
+    },
+    "复旦大学图书馆": {
+        "count": 7,
+        "province": "上海"
+    },
+    "华东师范大学图书馆": {
+        "count": 5,
+        "province": "上海"
+    },
+    "故宫博物院图书馆": {
+        "count": 6,
+        "province": "北京"
+    },
+    "云南师范大学图书馆": {
+        "count": 1,
+        "province": "云南"
+    },
+    "湖北师范大学图书馆": {
+        "count": 6,
+        "province": "湖北"
+    },
+    "山西省图书馆": {
+        "count": 1,
+        "province": "山西"
+    },
+    "中国科学院图书馆": {
+        "count": 4,
+        "province": "北京"
+    },
+    "首都图书馆": {
+        "count": 1,
+        "province": "北京"
+    },
+    "中共北京市委图书馆": {
+        "count": 1,
+        "province": "北京"
+    },
+    "苏州大学图书馆": {
+        "count": 2,
+        "province": "江苏"
+    },
+    "武汉大学图书馆": {
+        "count": 2,
+        "province": "湖北"
+    },
+    "台州市黄岩区图书馆": {
+        "count": 1,
+        "province": "浙江"
+    },
+    "福建设师范大学图书馆": {
+        "count": 1,
+        "province": "福建"
+    },
+    "山东师范大学图书馆": {
+        "count": 1,
+        "province": "山东"
+    },
+    "中国人民大学图书馆": {
+        "count": 1,
+        "province": "北京"
+    },
+    "中共中山学院图书馆": {
+        "count": 2,
+        "province": "广东"
+    },
+    "青海省图书馆": {
+        "count": 1,
+        "province": "青海"
+    },
+    "苏州市图书馆": {
+        "count": 2,
+        "province": "江苏"
+    },
+    "苏州市大学图书馆": {
+        "count": 1,
+        "province": "江苏"
+    },
+    "温州市图书馆": {
+        "count": 1,
+        "province": "浙江"
+    },
+    "安徽省图书馆": {
+        "count": 1,
+        "province": "安徽"
+    },
+    "岳阳师范学院图书馆": {
+        "count": 1,
+        "province": "湖南"
+    },
+    "山西省文物局": {
+        "count": 14,
+        "province": "山西"
+    },
+    "陕西师范大学": {
+        "count": 1,
+        "province": "陕西"
+    },
+    "常州市图书馆": {
+        "count": 2,
+        "province": "江苏"
+    },
+    "吉林省图书馆": {
+        "count": 2,
+        "province": "吉林"
+    },
+    "香港中环图书馆": {
+        "count": 1,
+        "province": "香港"
+    },
+    "上海师范大学": {
+        "count": 1,
+        "province": "上海"
+    },
+    "湖北博物馆图书馆": {
+        "count": 1,
+        "province": "湖北"
+    },
+    "天一阁文物保护所": {
+        "count": 1,
+        "province": "浙江"
+    },
+    "四川省图书馆": {
+        "count": 1,
+        "province": "四川"
+    },
+    "北京师范大学图书馆": {
+        "count": 1,
+        "province": "北京"
+    },
+    "台州图书馆": {
+        "count": 1,
+        "province": "浙江"
+    },
+    "山东博物馆": {
+        "count": 1,
+        "province": "山东"
+    },
+    "江苏省图书馆": {
+        "count": 1,
+        "province": "江苏"
+    }
+}

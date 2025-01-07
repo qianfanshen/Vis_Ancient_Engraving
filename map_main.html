@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>刻本、印本、抄本、修本折线图</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <link rel="stylesheet" href="assets/style.css">
+  <style>
+    body {
+      display: flex;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .button-container {
+        position: absolute;
+        left: 5%; /* 距离页面左边界5% */
+        top: 18%; /* 距离页面上方20% */
+        display: grid;
+        grid-template-columns: repeat(6, 1fr); /* 4列 */
+        grid-template-rows: repeat(4, 1fr); /* 6行 */
+        gap: 5px; /* 水平和垂直间距为10px */
+        width: 40%; /* 容器宽度占页面的90% */
+        height: 60%; /* 容器高度占页面的60% */
+        z-index: 1000;
+    }
+    /* 每个按钮的样式 */
+    .image-button {
+        border: none;
+        cursor: pointer;
+        width: 100%;
+        height: 100%;
+    }
+    .image-button:hover {
+        transform: scale(1.1);
+    }
+    .image-button img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* 图片按比例缩放以覆盖按钮 */
+    }
+    /* 被选中的按钮放大5% */
+    .selected {
+        transform: scale(1.05); /* 放大5% */
+    }
+    /* 时间轴容器 */
+    .timeline-container {
+        position: fixed;
+        bottom: 10%; /* 距离页面底部20% */
+        left: 0;
+        width: 100%; /* 宽度占100% */
+        display: flex;
+        justify-content: space-around; /* 等距分布各个时间点 */
+        align-items: center;
+        padding: 10px 0;
+        z-index: 1000;
+    }
+
+    /* 时间轴按钮的基础样式 */
+    .timeline-button {
+        border: 2px solid #ccc;
+        padding: 15px 30px;
+        border-radius: 30px;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    /* 鼠标悬停时改变背景色 */
+    .timeline-button:hover {
+        background-color: #e0e0e0;
+    }
+
+    /* 选中的时间点样式 */
+    .selected {
+        background-color: #007bff;
+        color: white;
+        transform: scale(1.1);
+    }
+    
+    /* 左侧文本区域 */
+    .cover-title {
+      position: absolute;
+      left: 5%;
+      top: 10%;
+      transform: translateY(-50%);
+      font-size: clamp(30px, 2vw, 66px);
+      color: #8B0000; /* 棕红色 */
+      font-family: 'MyCustomFont',"KaiTi", "STKaiti", "楷体", "Kaiti SC", serif;
+      max-width: 30vw;
+      max-height: 40vh;
+      overflow-y: auto;
+      line-height: 0.3;
+      text-align: justify;
+      animation: fadeIn 2s ease-in-out forwards;
+    
+      /* 删除 border-bottom */
+      margin-bottom: 0px; /* 设置合适的间距，调整距离 */
+    }
+    
+    /* 动画：直线从左到右 */
+    .cover-title:after {
+      content: ""; /* 创建伪元素 */
+      display: block;
+      width: 0; /* 初始宽度为 0 */
+      height: 3px;
+      background-color: #8B0000; /* 下划线的颜色 */
+      margin-top: 10px; /* 控制字与下划线的距离 */
+      animation: lineAnimation 2s ease-in-out forwards; /* 动效 */
+    }
+  
+  /* 动画：直线从左到右 */
+  @keyframes lineAnimation {
+      from {
+          width: 0;
+      }
+      to {
+          width: 100%;
+      }
+  }
+    .chart-container {
+      position: absolute;
+      left:22%; /* 让它紧挨着左侧文本 */
+      top: 60%;
+      transform: translateY(-55%);
+      width: 100%; /* 右侧占比 65% */
+      height: 100vh; /* 让图表不会超出 */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+  }
+  
+  /* 让 SVG 自适应 chart-container */
+  svg {
+      transform: scale(0.8);
+      width: 100%;
+      height: 100%;
+  }
+
+    /* 图例样式 */
+    .legend {
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .legend text {
+      cursor: pointer;
+    }
+    #tooltip {
+        position: absolute;
+        pointer-events: none; /* 允许鼠标事件穿透 */
+        opacity: 0;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        font-size: 14px;
+        z-index: 1000; /* 确保 tooltip 在最上层 */
+        max-width: 300px; 
+      }
+  </style>
+</head>
+<body>
+  <div class="cover-title">
+    <h2>馆藏-地域分布</h2>
+  </div>
+  <div class="button-container">
+    <button class="image-button" data-id="1">
+        <img src="assets/book_img/1_史记.png" alt="Button 1">
+    </button>
+    <button class="image-button" data-id="2">
+        <img src="assets/book_img/2_汉书.png" alt="Button 2">
+    </button>
+    <button class="image-button" data-id="3">
+        <img src="assets/book_img/3_后汉书.png" alt="Button 3">
+    </button>
+    <button class="image-button" data-id="4">
+        <img src="assets/book_img/4_三国志.png" alt="Button 4">
+    </button>
+    <button class="image-button" data-id="5">
+        <img src="assets/book_img/5_晋书.png" alt="Button 5">
+    </button>
+    <button class="image-button" data-id="6">
+        <img src="assets/book_img/6_宋书.png" alt="Button 6">
+    </button>
+    <button class="image-button" data-id="7">
+        <img src="assets/book_img/7_南齐书.png" alt="Button 7">
+    </button>
+    <button class="image-button" data-id="8">
+        <img src="assets/book_img/8_梁书.png" alt="Button 8">
+    </button>
+    <button class="image-button" data-id="9">
+        <img src="assets/book_img/9_陈书.png" alt="Button 9">
+    </button>
+    <button class="image-button" data-id="10">
+        <img src="assets/book_img/10_魏书.png" alt="Button 10">
+    </button>
+    <button class="image-button" data-id="11">
+        <img src="assets/book_img/11_北齐书.png" alt="Button 11">
+    </button>
+    <button class="image-button" data-id="12">
+        <img src="assets/book_img/12_周书.png" alt="Button 12">
+    </button>
+    <button class="image-button" data-id="13">
+        <img src="assets/book_img/13_隋书.png" alt="Button 13">
+    </button>
+    <button class="image-button" data-id="14">
+        <img src="assets/book_img/14_南史.png" alt="Button 14">
+    </button>
+    <button class="image-button" data-id="15">
+        <img src="assets/book_img/15_北史.png" alt="Button 15">
+    </button>
+    <button class="image-button" data-id="16">
+        <img src="assets/book_img/16_旧唐书.png" alt="Button 16">
+    </button>
+    <button class="image-button" data-id="17">
+        <img src="assets/book_img/17_唐书.png" alt="Button 17">
+    </button>
+    <button class="image-button" data-id="18">
+        <img src="assets/book_img/18_旧五代史.png" alt="Button 18">
+    </button>
+    <button class="image-button" data-id="19">
+        <img src="assets/book_img/19_五代史.png" alt="Button 19">
+    </button>
+    <button class="image-button" data-id="20">
+        <img src="assets/book_img/20_宋史.png" alt="Button 20">
+    </button>
+    <button class="image-button" data-id="21">
+        <img src="assets/book_img/21_辽史.png" alt="Button 21">
+    </button>
+    <button class="image-button" data-id="22">
+        <img src="assets/book_img/22_金史.png" alt="Button 22">
+    </button>
+    <button class="image-button" data-id="23">
+        <img src="assets/book_img/23_元史.png" alt="Button 23">
+    </button>
+    <button class="image-button" data-id="24">
+        <img src="assets/book_img/24_明史.png" alt="Button 24">
+    </button>
+  </div>
+
+  <div class="timeline-container">
+    <button class="timeline-button" data-period="宋">宋</button>
+    <button class="timeline-button" data-period="元">元</button>
+    <button class="timeline-button" data-period="明">明</button>
+    <button class="timeline-button" data-period="清">清</button>
+    <button class="timeline-button" data-period="民国">民国</button>
+    <button class="timeline-button" data-period="现代">现代</button>
+    <button class="timeline-button" data-period="全">全</button>
+  </div>
+
+  <div id="tooltip"></div>
+
+  <div class="chart-container">
+    <svg id="map"></svg>
+  </div>
+
+</body>
+</html>

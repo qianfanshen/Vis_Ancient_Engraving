@@ -7,6 +7,8 @@
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
   <script src="chartFunctions.js"></script>
+  <script src="mapFunctions.js"></script>
+  <script src="mapmainFunctions.js"></script>
   <style>
     body {
       margin: 0;
@@ -76,7 +78,7 @@
 
   <script>
     // 每次在这里添加新的页面即可
-    const files = ['cover.html', 'page1.html', 'page2.html', 'page3.html', 'page_type_dist.html', 'map.html']; // 页面内容文件
+    const files = ['cover.html', 'page1.html', 'page2.html', 'page3.html', 'page_type_dist.html', 'page4.html', 'map_main.html']; // 页面内容文件
     let currentPage = 0; // 当前页面索引
     let isScrolling = false; // 防止滚动事件频繁触发
     const upArrow = document.getElementById('upArrow');
@@ -85,10 +87,40 @@
     // 加载页面内容
     // 加载页面内容（添加滑动翻页动画）
 // 直接切换页面，无动画
-  function loadPage(index) {
-    d3.html(files[index]).then(content => {
-      d3.select('#content').html(''); // 清空当前内容
-      d3.select('#content').node().append(content.documentElement); // 直接替换内容
+function loadPage(index) {
+  d3.html(files[index]).then(content => {
+    d3.select('#content').html(''); // 清空当前内容
+    d3.select('#content').node().append(content.documentElement); // 直接替换内容
+
+    // 更新箭头可见性
+    upArrow.style.display = index === 0 ? 'none' : 'block';
+    downArrow.style.display = index === files.length - 1 ? 'none' : 'block';
+
+    if (index === 2) {
+      initializeChartPage2(); // 页1初始化
+    } else if (index === 3) {
+      initializev1position(); // 页2初始化
+        initializev2position();
+        drawChartPage3_v2(); // 页3初始化
+        let isV1 = false; // 当前布局状态
+
+        document.getElementById("toggle-button").addEventListener("click", function () {
+          if(!isV1) {
+            switchToV1();
+          } else {
+            switchToV2();
+          }
+          isV1 = !isV1; // 切换状态
+        });
+    } else if (index === 4) {
+      initializeChartPageTypeDist();
+    } else if (index === 5) {
+      initializeMapPage('assets/map_data.json', 'assets/province.json', 'assets/library_with_province.json');
+    } else if (index === 6) {
+      initializeMapMainPage('assets/map_data.json', 'assets/province.json', 'assets/library_with_province.json');
+    }
+  });
+}
 
       // 更新箭头可见性
       upArrow.style.display = index === 0 ? 'none' : 'block';
