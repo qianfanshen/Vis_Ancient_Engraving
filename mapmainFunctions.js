@@ -101,7 +101,7 @@ function countByTitle(filteredData) {
         }
         // 更新计数和书籍名称列表
         provinceData[province].count++;
-        provinceData[province].books.push(book.title); // 假设书籍名称存储在 title 字段
+        provinceData[province].books.push(book.title+'（'+book.ancient_version+'）'); // 假设书籍名称存储在 title 字段
       }
     });
   });
@@ -143,6 +143,9 @@ function filterDataByDynasty(data, minDynasty, maxDynasty) {
 
   return filteredData;
 }
+
+
+let isTooltipVisible = false;  // 新增标志，判断tooltip是否显示
 
 function draw(geoData, data, selectedCategories, minDynasty, maxDynasty) {
   const NewData = filterDataByDynasty(data, minDynasty, maxDynasty);
@@ -197,8 +200,7 @@ function draw(geoData, data, selectedCategories, minDynasty, maxDynasty) {
     .attr("stroke", "black")
     .attr("stroke-width", 0.5);
 
-
-  const libraryMap = countByTitle(filteredData)
+  const libraryMap = countByTitle(filteredData);
 
   // 获取 tooltip 元素
   const tooltip = d3.select("#tooltip")
@@ -214,44 +216,77 @@ function draw(geoData, data, selectedCategories, minDynasty, maxDynasty) {
   // 添加交互性：鼠标悬停显示名称和数量
   svg.selectAll("path")
     .on("mouseover", function(event, d) {
-      // 改变颜色
-      d3.select(this).attr("fill", "blue");
+      if (!isTooltipVisible) {
+        // 只有在tooltip没有显示的情况下才响应mouseover
+        d3.select(this).attr("fill", "blue");
 
-      const provinceName = d.properties.name;
+        const provinceName = d.properties.name;
 
-      // 从 result 中获取该省份的数据
-      const provinceData = libraryMap[provinceName] || { count: 0, books: [] };
+        // 从 result 中获取该省份的数据
+        const provinceData = libraryMap[provinceName] || { count: 0, books: [] };
 
-      // 构建书籍列表
-      const bookList = provinceData.books.join('<br>');
+        // 构建书籍列表
+        const bookList = provinceData.books.join('<br>');
 
-      // 显示并设置 tooltip 内容和位置
-      tooltip
-        .style("left", (event.pageX + 10) + "px")
-        .style("top", (event.pageY + 10) + "px")
-        .style("opacity", 1)
-        .html(`
-          <strong>${provinceName}</strong><br>
-          数量: ${provinceData.count}<br><br>
-          <strong>书籍列表:</strong><br>
-          ${bookList}
-        `)
-        .node().scrollTop = 0;
+        // 显示并设置 tooltip 内容和位置
+        tooltip
+          .style("left", (event.pageX + 10) + "px")
+          .style("top", (event.pageY + 10) + "px")
+          .style("opacity", 1)
+          .html(`
+            <strong>${provinceName}</strong><br>
+            数量: ${provinceData.count}<br><br>
+            <strong>书籍列表:</strong><br>
+            ${bookList}
+          `)
+          .node().scrollTop = 0;
+      }
     })
     .on("mousemove", function(event) {
-      // 更新 tooltip 位置
-      tooltip
-        .style("left", (event.pageX + 10) + "px")
-        .style("top", (event.pageY + 10) + "px");
+      if (!isTooltipVisible) {
+        // 只有在tooltip没有显示的情况下才响应mousemove，避免影响点击事件
+        tooltip
+          .style("left", (event.pageX + 10) + "px")
+          .style("top", (event.pageY + 10) + "px");
+      }
     })
     .on("mouseout", function(event, d) {
-      // 恢复颜色
-      const provinceName = d.properties.name;
-      const quantity = +quantityMap.get(provinceName) || 0;
-      d3.select(this).attr("fill", quantity > 0 ? color(quantity) : zeroColor);
+      if (!isTooltipVisible) {
+        // 只有在tooltip没有显示的情况下才响应mouseout
+        const provinceName = d.properties.name;
+        const quantity = +quantityMap.get(provinceName) || 0;
+        d3.select(this).attr("fill", quantity > 0 ? color(quantity) : zeroColor);
 
-      // 隐藏 tooltip
-      tooltip.style("opacity", 0);
+        // 隐藏 tooltip
+        tooltip.style("opacity", 0);
+      }
+    })
+    .on("click", function(event, d) {
+      const provinceName = d.properties.name;
+
+      if (isTooltipVisible) {
+        // 如果tooltip已经显示，点击时隐藏
+        tooltip.style("opacity", 0);
+        isTooltipVisible = false; // 标记为隐藏状态
+      } else {
+        // 如果tooltip没有显示，点击时显示
+        const provinceData = libraryMap[provinceName] || { count: 0, books: [] };
+        const bookList = provinceData.books.join('<br>');
+
+        tooltip
+          .style("left", (event.pageX + 10) + "px")
+          .style("top", (event.pageY + 10) + "px")
+          .style("opacity", 1)
+          .html(`
+            <strong>${provinceName}</strong><br>
+            数量: ${provinceData.count}<br><br>
+            <strong>书籍列表:</strong><br>
+            ${bookList}
+          `)
+          .node().scrollTop = 0;
+
+        isTooltipVisible = true; // 标记为显示状态
+      }
     });
 
   // 窗口大小调整时更新地图尺寸
@@ -267,6 +302,7 @@ function draw(geoData, data, selectedCategories, minDynasty, maxDynasty) {
     svg.selectAll("path").attr("d", path);
   });
 }
+
 
 function map_dynasty(dynasty) {
   if (dynasty == "宋") {

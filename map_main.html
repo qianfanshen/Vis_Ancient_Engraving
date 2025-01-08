@@ -7,6 +7,10 @@
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <link rel="stylesheet" href="assets/style.css">
   <style>
+    @font-face {
+        font-family: 'MyCustomFont';
+        src: url('assets/Kaiti.TTF') format('truetype'); /* 替换成你的字体文件 */
+    }
     body {
       display: flex;
       font-family: Arial, sans-serif;
@@ -21,7 +25,7 @@
         grid-template-columns: repeat(6, 1fr); /* 4列 */
         grid-template-rows: repeat(4, 1fr); /* 6行 */
         gap: 5px; /* 水平和垂直间距为10px */
-        width: 40%; /* 容器宽度占页面的90% */
+        width: 35%; /* 容器宽度占页面的90% */
         height: 60%; /* 容器高度占页面的60% */
         z-index: 1000;
     }
@@ -47,7 +51,7 @@
     /* 时间轴容器 */
     .timeline-container {
         position: fixed;
-        bottom: 10%; /* 距离页面底部20% */
+        bottom: 20%; /* 距离页面底部20% */
         left: 0;
         width: 100%; /* 宽度占100% */
         display: flex;
@@ -157,9 +161,10 @@
         box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
         font-size: 14px;
         z-index: 1000; /* 确保 tooltip 在最上层 */
-        max-width: 300px;
-        max-height: 200px; /* 设置最大高度 */
+        max-width: 500px;
+        max-height: 400px; /* 设置最大高度 */
         overflow-y: auto; /* 添加垂直滚动条 */
+        transition: opacity 0.3s ease;
       }
 
     .image-button {
@@ -168,12 +173,14 @@
         padding: 0;
         cursor: pointer;
         transition: filter 0.3s ease;
-        margin: 10px; /* 按钮之间的间距 */
+        margin: 4px; /* 按钮之间的间距 */
+        width: 80%; /* 设置为较小的百分比，或直接使用像素单位 */
+        height: 80%;
     }
 
     .image-button img {
-        width: 100px;
-        height: 100px;
+        width: 100%;
+        height: 100%;
         filter: grayscale(100%);
         transition: filter 0.3s ease;
     }
@@ -196,7 +203,7 @@
 
     #slider-container {
         position: fixed; /* 固定位置 */
-        bottom: 0; /* 固定在页面底部 */
+        bottom: 6%; /* 固定在页面底部 */
         left: 10%; /* 从页面左侧开始 */
         width: 80%; /* 宽度占满页面 */
         padding: 20px 0; /* 上下内边距 */
@@ -204,26 +211,29 @@
         z-index: 1000; /* 确保滑块在最上层 */
     }
 
+
     #slider {
-        width: 100%; /* 滑块宽度占容器的 80% */
+        width: 95%; /* 滑块宽度占容器的 80% */
         margin: 0 auto; /* 水平居中 */
     }
 
     #labels {
         display: flex;
         justify-content: space-between;
-        margin-top: 10px;
-        padding: 0 0%; /* 调整标签的内边距以对齐滑块 */
+        margin-top: 25px;
+        padding: 0 1%; /* 调整标签的内边距以对齐滑块 */
     }
 
     #labels span {
-        font-size: 14px;
+        font-size: 28px;
         color: #333;
+        font-family: 'MyCustomFont', sans-serif;
+        font-weight: 400;
     }
 
     input[type="range"] {
         position: absolute;
-        width: calc(100%); /* 调整宽度以对齐标签 */
+        width: calc(96%); /* 调整宽度以对齐标签 */
         left: 0; /* 调整位置以对齐标签 */
         pointer-events: none;
         -webkit-appearance: none;
@@ -233,15 +243,15 @@
     }
 
     input[type="range"]::-webkit-slider-runnable-track {
-        height: 5px;
+        height: 8px;
         background: #ddd;
-        border-radius: 5px;
+        border-radius: 8px;
     }
 
     input[type="range"]::-webkit-slider-thumb {
         -webkit-appearance: none;
-        height: 15px;
-        width: 15px;
+        height: 20px;
+        width: 20px;
         background: #8B0000;
         border-radius: 50%;
         pointer-events: all;
@@ -250,18 +260,43 @@
     }
 
     input[type="range"]::-moz-range-track {
-        height: 5px;
+        height: 10px;
         background: #ddd;
-        border-radius: 5px;
+        border-radius: 10px;
     }
 
     input[type="range"]::-moz-range-thumb {
-        height: 15px;
-        width: 15px;
+        height: 20px;
+        width: 20px;
         background: #8B0000;
         border-radius: 50%;
         pointer-events: all;
         cursor: pointer;
+    }
+    #slider input[type="range"]::-webkit-slider-thumb:hover,
+    #slider input[type="range"]::-webkit-slider-thumb:active {
+        transform:  scale(1.25);
+    }
+    .scale-line {
+        position: absolute;
+        top: -20px; /* 调整刻度线的高度，使其显示在滑块上方 */
+        left: 0;
+        width: 100%;
+        height: 10px;
+        display: flex;
+        justify-content: space-between;
+        pointer-events: none; /* 防止干扰用户与滑块交互 */
+    }
+    
+    .scale-line span {
+        width: 1px; /* 刻度线的宽度 */
+        height: 100%; /* 刻度线的高度 */
+        background-color: #333; /* 刻度线的颜色 */
+    }
+    
+    /* 样式调整刻度线 */
+    .scale-line span:nth-child(odd) {
+        background-color: #8B0000; /* 更改奇数位置的刻度线颜色 */
     }
   </style>
 </head>
@@ -357,6 +392,7 @@
         <div id="slider">
             <input type="range" id="min-slider" min="0" max="5" value="0">
             <input type="range" id="max-slider" min="0" max="5" value="5">
+            <div class="scale-line" id="scale-line"></div>
         </div>
         <div id="labels">
             <span>宋</span>
